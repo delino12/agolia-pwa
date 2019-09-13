@@ -1,0 +1,23 @@
+{
+  "name": "sebastianfx",
+  "version": "1.0.0",
+  "description": "Sebastian PWA",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://delino12@bitbucket.org/delino12/sebastian-pwa.git"
+  },
+  "keywords": [
+    "nodejs",
+    "handlebars",
+    "expressjs",
+    "services",
+    "worker"
+  ],
+  "author": "Cavidel - Ekpoto Liberty",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/delino12/sebastian-pwa#readme"
+}
