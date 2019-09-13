@@ -1,0 +1,63 @@
+body {
+	background: #1479e4;
+}
+
+.agent-title {
+	position: relative;
+	top: -5px;
+}
+
+.buy-title {
+	position: relative;
+	top: -5px;
+}
+
+.sell-title {
+	position: relative;
+	top: -5px;
+}
+
+.transaction-title {
+	position: relative;
+	top: -5px;
+}
+
+.transaction-completed-title {
+	position: relative;
+	top: -5px;
+}
+
+.settings-title {
+	position: relative;
+	top: -5px;
+}
+
+.logout-title {
+	position: relative;
+	top: -5px;
+}
+
+.main-contents {
+	background-color: #031480;
+}
+
+.card-feel {
+	/*box-shadow: 0rem 0rem 0.5em 0em rgba(200,200,200,0.95)*/
+	box-shadow: 0rem 0rem 0.5em 0em rgb(43, 54, 144);
+}
+
+.card-box {
+	min-height: 300px;
+    margin-top: 20px;
+    border-radius: 1rem;
+    padding: 1rem;
+    background-color: #0c1654;
+    color: #FFF;
+}
+
+.input-classic {
+	padding: 1rem;
+	font-size: 14px;
+	border-radius: 5px;
+	border:1px thin #CCC;
+}

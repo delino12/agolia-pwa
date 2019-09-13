@@ -1,9 +1,10 @@
 {
   "name": "sebastianfx",
   "version": "1.0.0",
-  "description": "Sebastian PWA",
-  "main": "app.js",
+  "description": "Sebastianfx PWA",
+  "main": "nodemon bin/www",
   "scripts": {
+    "dev": "nodemon bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,5 +20,33 @@
   ],
   "author": "Cavidel - Ekpoto Liberty",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/delino12/sebastian-pwa#readme"
+  "homepage": "https://bitbucket.org/delino12/sebastian-pwa#readme",
+  "dependencies": {
+    "@sendgrid/mail": "^6.4.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cloudinary": "^1.14.0",
+    "cookie-parser": "^1.4.4",
+    "debug": "^4.1.1",
+    "dotenv": "^6.2.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.5",
+    "express-handlebars": "^3.1.0",
+    "express-session": "^1.15.6",
+    "jsonwebtoken": "^8.4.0",
+    "mocha": "^6.1.4",
+    "moment": "^2.24.0",
+    "mongodb": "^3.1.13",
+    "mongoose": "^5.4.8",
+    "morgan": "^1.9.1",
+    "node-geocoder": "^3.22.0",
+    "nodemailer": "^6.2.1",
+    "nodemon": "^1.19.1",
+    "pusher": "^2.2.0",
+    "pusher-js": "^4.4.0",
+    "randomatic": "^3.1.1",
+    "request-promise": "^4.2.4",
+    "serve-favicon": "^2.5.0",
+    "stream-throttle": "^0.1.3"
+  }
 }
