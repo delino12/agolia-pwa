@@ -9,6 +9,7 @@ var filesToCache = [
     'js/popper.min.js',
     'js/bootstrap.min.js',
     'js/numeral.js',
+    'js/printme.js',
     'buy',
     'sell',
     'transaction',

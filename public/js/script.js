@@ -734,20 +734,20 @@ function getAllTransactions(start = 0, total = 10) {
 				    $("#load-all-transactions").append(`
 				        <tr ${shade}>
 				            <td>
-				            	<a href="javascript:void(0);" ${shade} onclick="viewTransaction(${val.id}, ${val.trade_type})">
+				            	<a href="javascript:void(0);" ${shade} onclick="viewTransaction(${val.id})">
 				                    ${val.name}
 				                </a> 
 				            </td>
 				            <td>${val.consideration} <br /> (${val.volume} * ${val.rate})</td>
 				            <td>${val.currency}</td>
 				            <td>
-				            	<a href="javascript:void(0);" ${shade} onclick="previewReceipt(${val.id}, ${val.trade_type})">
+				            	<a href="javascript:void(0);" ${shade} onclick="previewReceipt(${val.id})">
 				                    <i class="material-icons">print</i></a>
 				                </a> 
-				                <a href="javascript:void(0);" ${shade} onclick="syncUser(${val.id})">
-				                    <i id="sync-icon-${sn}" class="material-icons">cloud_upload</i>
+				                <a href="javascript:void(0);" ${shade} onclick="syncTransaction(${val.id})" id="sync-icon-${val.id}">
+				                	<i class="material-icons">cloud_upload</i>
 				                </a>
-				                <a href="javascript:void(0);" ${shade} onclick="deleteUser(${val.id})">
+				                <a href="javascript:void(0);" ${shade} onclick="deleteTransaction(${val.id})">
 				                <i class="material-icons">restore_from_trash</i></a>
 				            </td>
 				        </tr>
@@ -787,7 +787,7 @@ function getOneTransaction(trans_id) {
 
 // view transaction
 function viewTransaction(trans_id) {
-	getOneTransaction(trans_id).then(transaction => {
+	getOneTransaction(trans_id).then(async transaction => {
 		if(transaction.currency == "1"){
 			transaction.currency = "USD - Dollar";
 		}else if(transaction.currency == "2"){
@@ -814,6 +814,15 @@ function viewTransaction(trans_id) {
 				<span class="text-danger">Transaction Details - SELL</span>
 			`);
 		}
+
+		if(transaction.pay_bank_name){
+			transaction.pay_bank_name = await getBankByCode(transaction.pay_bank_name).then(bank_name => bank_name)
+		}
+
+		if(transaction.receive_bank_name){
+			transaction.receive_bank_name = await getBankByCode(transaction.receive_bank_name).then(bank_name => bank_name)
+		}
+
 
 		transaction.volume 		 = numeral(transaction.volume).format('0,0.00');
 		transaction.rate 		 = numeral(transaction.rate).format('0,0.00');
@@ -915,9 +924,67 @@ function viewTransaction(trans_id) {
 	})
 }
 
+// sync records
+function syncTransaction(trans_id) {
+	$(`#sync-icon-${trans_id}`).html(`
+		<span class="small">uploading...</span>
+	`);
+
+	getOneTransaction(trans_id).then(transaction => {
+		console.log(transaction);
+		$.ajax({
+  			url: 'http://localhost:8181/api/save/transaction',
+  			type: 'POST',
+  			dataType: 'json',
+  			data: transaction,
+  			success: function(data){
+  				console.log(data);
+  				if(data.status == 'success'){
+  					notifyMe("success", data.message);
+					$(`#sync-icon-${trans_id}`).html(`
+						<i class="material-icons">cloud_done</i>
+					`);
+  				}else{
+  					notifyMe("danger", data.message);
+					$(`#sync-icon-${trans_id}`).html(`
+						<i class="material-icons">cloud_upload</i>
+					`);	
+  				}
+  			}
+  		}).done(function() {
+  			console.log("done");
+  		}).fail(function(err) {
+  			console.log(err);
+  			notifyMe("danger", "Error synching to cloud service!");
+			$(`#sync-icon-${trans_id}`).html(`
+				<i class="material-icons">cloud_upload</i>
+			`);
+  		});
+	});
+}
+
+// delete transaction
+function deleteTransaction(trans_id) {
+	// delete 
+	const db = openDatabase();
+
+	// wait for transactions to arrive
+  	db.onsuccess = (event) => {
+  		// body...
+		var query = event.target.result;
+	  	var transactions = query.transaction("transactions", "readwrite").objectStore("transactions");
+
+	  	// destroy id
+  		transactions.delete(trans_id);
+  	}
+
+  	// fetch new updates
+	getAllTransactions(0, 10);
+}
+
 // view transaction
 function previewReceipt(trans_id, trans_type) {
-	getOneTransaction(trans_id).then(transaction => {
+	getOneTransaction(trans_id).then(async transaction => {
 		if(transaction.currency == "1"){
 			transaction.currency = "USD - Dollar";
 		}else if(transaction.currency == "2"){
@@ -947,6 +1014,14 @@ function previewReceipt(trans_id, trans_type) {
 			transaction.trade_type = "Purchased";
 		}
 
+		if(transaction.pay_bank_name){
+			transaction.pay_bank_name = await getBankByCode(transaction.pay_bank_name).then(bank_name => bank_name)
+		}
+
+		if(transaction.receive_bank_name){
+			transaction.receive_bank_name = await getBankByCode(transaction.receive_bank_name).then(bank_name => bank_name)
+		}
+
 		transaction.volume 		 = numeral(transaction.volume).format('0,0.00');
 		transaction.rate 		 = numeral(transaction.rate).format('0,0.00');
 		transaction.pay_cash	 = numeral(transaction.pay_cash).format('0,0.00');
@@ -966,7 +1041,7 @@ function previewReceipt(trans_id, trans_type) {
 					<td>${transaction.name}</td>
 				</tr>
 				<tr>
-					<td>Transaction Type</td>
+					<td>Transaction</td>
 					<td>${transaction.trade_type}</td>
 				</tr>
 				<tr>
@@ -1039,10 +1114,36 @@ function previewReceipt(trans_id, trans_type) {
 					</tr>
 				</table>
 
-			<button class="btn btn-flat float-right">
+			<button class="btn btn-flat float-right" onclick="printReceipt()">
 				<i class="material-icons">print</i> <span class="print-title">Receipt</span>
 			</button>
 		`);
 		$("#show-preview-modal").modal();
 	})
+}
+
+// get bank name
+function getBankByCode(bank_code) {
+	return new Promise((resolve, reject) => {
+		fetch(`/banks.json`).then(r => {
+			return r.json();
+		}).then(results => {
+			// console.log(results)
+			$.each(results.data, function(index, bank) {
+				/* iterate through array or object */
+				if(bank_code == bank.code){
+					resolve(bank.name)
+				}
+			});
+		}).catch(err => {
+			reject(err)
+		})
+	});
+}
+
+function printReceipt() {
+	$("#printable-area").printMe({
+		"path": ["css/bootstrap.css", "css/style.css"],
+		"title": "SB-BDC Receipt" 
+	});
 }
