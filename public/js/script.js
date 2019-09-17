@@ -394,6 +394,12 @@ function getAvailableBanks() {
 		// console.log(results)
 		$("#pay_customer_bank_name").html("");
 		$("#receive_bank_name").html("");
+		$("#pay_customer_bank_name").append(`
+			<option value=""> -- select bank -- </option>
+		`)
+		$("#receive_bank_name").append(`
+			<option value=""> -- select bank -- </option>
+		`)
 		$.each(results.data, function(index, bank) {
 			 /* iterate through array or object */
 			$("#pay_customer_bank_name").append(`
