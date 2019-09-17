@@ -496,13 +496,19 @@ function notifyMe(status, message) {
 
 function notifyMeUpdate(status, message) {
 	// body...
-	// $("#notification-wrapper").show();
-	// $("#notification-wrapper")
 	$("#notification-wrapper").html(`
 		<span class="text-${status}">${message}</span> 
-
-		<a href="javascript:void(0);" onclick="updateApp()" class="btn btn-default btn-sm">Update now</a>
+		<a href="javascript:void(0);" onclick="resetWorker()" class="btn btn-default btn-xs small">Update now</a>
 	`).show();
+}
+
+function resetWorker() {
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+      	for(let registration of registrations) {
+          registration.unregister();
+      	} 
+      	window.location.reload();
+    });
 }
 
 function setDefaultCurrency() {
