@@ -1,12 +1,19 @@
 var filesToCache = [
     '/',
+    'img/android-icon-48x48.png',
     'css/bootstrap.min.css',
     'css/style.css',
     'https://fonts.googleapis.com/icon?family=Material+Icons',
     'https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Oswald:200,300,400,500,600,700',
     'js/jquery.min.js',
     'js/popper.min.js',
-    'js/bootstrap.min.js'
+    'js/bootstrap.min.js',
+    'js/numeral.js',
+    'buy',
+    'sell',
+    'transaction',
+    'completed',
+    'banks.json'
 ];
 
 var staticCacheName = `sebastianfx-cache-v1`;

@@ -1,0 +1,77 @@
+<nav class="navbar navbar-expand-md card-feel" style="background-color: #0c1654;color: #FFF;">
+    <!-- Brand -->
+    <a class="navbar-brand text-white" href="/">
+        <i class="material-icons">keyboard_backspace</i> <span class="text-white buy-title">Home</span>
+    </a>
+    <span class="buy-title text-success">Transactions</span>
+    <a href="javascript:void(0)">
+        <i class="material-icons">perm_identity</i> <span class="agent-title">SB-A21884</span>
+    </a>
+</nav>
+
+<div class="container-fluid main-contents" id="select-option">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table small text-white">
+                <thead>
+                    <tr>
+                        <th width="30%">Name</th>
+                        <th width="30%">Consideration</th>
+                        <th width="10%">Currency</th>
+                        <th width="30%">Option</th>
+                    </tr>
+                </thead>
+                <tbody id="load-all-transactions"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- preview transaction -->
+<div class="modal fade" id="show-preview-transaction" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="transaction-title"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="show-transaction-data"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="pull-right">
+                    <button class="btn btn-flat" type="button" data-dismiss="modal">
+                        close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- preview transaction -->
+<div class="modal fade" id="show-preview-modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="receipt-title">Preview</h4>
+            </div>
+            <div class="modal-body">
+                <div id="show-preview-data"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="pull-right">
+                    <button class="btn btn-flat" type="button" data-dismiss="modal">
+                        close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style type="text/css">
+    body {
+        background-color: #0c1654;
+        color: #fff;
+    }
+</style>

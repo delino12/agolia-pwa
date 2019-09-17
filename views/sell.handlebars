@@ -1,0 +1,218 @@
+<nav class="navbar navbar-expand-md card-feel" style="background-color: #0c1654;color: #FFF;">
+    <!-- Brand -->
+    <a class="navbar-brand text-white" href="/">
+        <i class="material-icons">keyboard_backspace</i> <span class="text-white sell-title">Home</span>
+    </a>
+    <span class="sell-title text-danger">SELL</span>
+    <a href="javascript:void(0)">
+        <i class="material-icons">perm_identity</i> <span class="agent-title">SB-A21884</span>
+    </a>
+</nav>
+
+<div class="container-fluid main-contents" id="main-contents">
+    <form method="POST" onsubmit="return saveToQueue()" id="transaction-form">
+        <input type="hidden" id="trade_type" value="2" name="">
+        <input type="hidden" id="document_file" name="">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card-feel card-box">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h5>Customer</h5>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="customer_name">Names</label>
+                                <input type="text" onblur="previewCustomerName()" class="form-control input-classic" placeholder="Eg, Suleiman Frank" id="customer_name" required="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="customer_phone">Phone Number</label>
+                                <input type="number" step="any" class="form-control input-classic" placeholder="Eg, 09090009000" id="customer_phone" onkeyup="validatePhoneNumber(this)" required="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="customer_email">Email</label>
+                                <input type="email" class="form-control input-classic" placeholder="someone@domain.com" id="customer_email" required="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card-feel card-box">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h5>Exchange</h5>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="customer_currency">Currency</label>
+                                <select class="form-control text-primary" id="customer_currency" onchange="setDefaultCurrency()" required="">
+                                    <option value="1">USD</option>
+                                    <option value="2">EUR</option>
+                                    <option value="3">GBP</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="customer_volume">Volume</label>
+                                <input type="text" pattern="[0-9.,]+" onblur="calculateEquivalent()" onkeyup="formatVolume(this)" step="any" min="0" id="customer_volume" class="form-control input-classic" placeholder="Eg, 1,000,000" required="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="customer_rate">Rate</label>
+                                <input type="text" pattern="[0-9.,]+" onblur="calculateEquivalent()" onkeyup="formatRate(this)" step="any" min="0" id="customer_rate" class="form-control input-classic" placeholder="Eg, 360.00" value="0" required="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group" id="exchange-preview"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card-feel card-box">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h5>SB-BDC Collect <-- <span id="preview-pay-currency"></span></h5>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-6" style="width: 50%;">
+                            <div class="form-group">
+                                <label for="pay_customer_cash">Cash</label>
+                                <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="pay_customer_cash">
+                            </div>
+                        </div>
+                        <div class="col-sm-6" style="width: 50%;">
+                            <div class="form-group">
+                                <label for="pay_customer_wire">Wire</label>
+                                <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="pay_customer_wire">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="pay_customer_bank_name">Bank Name</label>
+                                <select class="form-control" id="pay_customer_bank_name">
+                                    <option value="">Select Bank</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="customer_currency">Account Number</label>
+                                <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="customer_bank_nuban">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card-feel card-box">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h5>Pay --> <span id="preview-customer-name">[Customer]</span> <span id="preview-receive-currency"></span> </h5>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-6" style="width: 50%;">
+                            <div class="form-group">
+                                <label for="receive_customer_cash">Cash</label>
+                                <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="receive_customer_cash">
+                            </div>
+                        </div>
+                        <div class="col-sm-6" style="width: 50%;">
+                            <div class="form-group">
+                                <label for="receive_customer_wire">Wire</label>
+                                <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="receive_customer_wire">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="receive_bank_name">Bank Name</label>
+                                <select class="form-control" id="receive_bank_name">
+                                    <option value="">Select Bank</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="receive_bank_nuban">Account Number</label>
+                                <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="receive_bank_nuban">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-feel card-box" style="min-height: 100px;">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <a href="javascript:void(0);">
+                            <i class="material-icons">attach_file</i> 
+                            <span class="sell-title"> Capture & Upload Documents</span> 
+                        </a>
+                        <a class="text-white float-right" href="javascript:void(0);" onclick="addCustomerFileInput()">
+                            <i class="material-icons">add</i> 
+                        </a>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group" id="customer_files"></div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <button class="btn btn-danger">
+                            Save and Print Receipt
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style type="text/css">
+    body {
+        background-color: #902626;
+    }
+</style>

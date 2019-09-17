@@ -7,6 +7,11 @@ body {
 	top: -5px;
 }
 
+.print-title {
+	position: relative;
+	top: -5px;
+}
+
 .buy-title {
 	position: relative;
 	top: -5px;
@@ -38,7 +43,7 @@ body {
 }
 
 .main-contents {
-	background-color: #031480;
+	/*background-color: #031480;*/
 }
 
 .card-feel {
@@ -60,4 +65,21 @@ body {
 	font-size: 14px;
 	border-radius: 5px;
 	border:1px thin #CCC;
+}
+
+#notification-wrapper {
+	position: fixed;
+    min-height: 60px;
+    min-width: 100%;
+    box-shadow: 0rem 0rem 0.3rem 0rem rgba(0,0,0,0.5);
+    /* border-radius: 5px; */
+    /* right: 20px; */
+    bottom: 0;
+    /* margin-bottom: 30px; */
+    padding: 1rem;
+    font-size: 12px;
+    color: #64696d;
+    background-color: #e6ebf1;
+    z-index: 100;
+    display: none;
 }
