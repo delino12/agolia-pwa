@@ -2,23 +2,28 @@ window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
 		// register the service worker
 		navigator.serviceWorker.register('/service-worker.js', {scope: '/'}).then(function(sw) {
+			console.log(sw);
 
 			// check service worker controller
 			if(!navigator.serviceWorker.controller) return;
 
 			// on waiting state
-			if(sw.waiting){
-				console.log('You have a waiting services worker');
+			if(sw.waiting !== null){
+				sw.waiting.postMessage({action: 'skipWaiting'});
 			}
 
 			// on installing state
-			if(sw.installing){
-				console.log('New service worker is installing');
-				// trackInstalling(sw.installing);
+			if(sw.installing !== null){
+				sw.addEventListener('statechange', function(e){
+					if(e.target.state == "installed"){
+						notifyMe('success', 'Application update has been installed!');
+					}
+				});
 			}
 
 			// on updated found
 			sw.addEventListener('updatefound', function (){
+				notifyMeUpdate('success', 'You have new updates, click the app update button');
 				console.log('Application found a new update on services worker');
 			});
 		});
@@ -487,6 +492,17 @@ function notifyMe(status, message) {
 	setTimeout(function(e) {
 		$("#notification-wrapper").fadeOut();
 	}, 1000 * 5);
+}
+
+function notifyMeUpdate(status, message) {
+	// body...
+	// $("#notification-wrapper").show();
+	// $("#notification-wrapper")
+	$("#notification-wrapper").html(`
+		<span class="text-${status}">${message}</span> 
+
+		<a href="javascript:void(0);" onclick="updateApp()" class="btn btn-default btn-sm">Update now</a>
+	`).show();
 }
 
 function setDefaultCurrency() {

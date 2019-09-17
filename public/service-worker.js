@@ -18,8 +18,10 @@ var filesToCache = [
     'banks.json'
 ];
 
+// cache name
 var staticCacheName = `sebastianfx-cache-v1`;
 
+// install cache
 self.addEventListener('install', function(event) {
     console.log('Ready to install service worker and cache static assets');
     event.waitUntil(
@@ -30,6 +32,7 @@ self.addEventListener('install', function(event) {
     );
 });
 
+// active a new service worker
 self.addEventListener('activate', function(event) {
     event.waitUntil(
         caches.keys().then(function(cacheNames){
