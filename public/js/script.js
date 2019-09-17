@@ -1,69 +1,85 @@
 window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js').then(initialiseState);
+		// register the service worker
+		navigator.serviceWorker.register('/service-worker.js', {scope: '/'}).then(function(sw) {
+
+			// check service worker controller
+			if(!navigator.serviceWorker.controller) return;
+
+			// on waiting state
+			if(sw.waiting){
+				console.log('You have a waiting services worker');
+			}
+
+			// on installing state
+			if(sw.installing){
+				console.log('New service worker is installing');
+				// trackInstalling(sw.installing);
+			}
+
+			// on updated found
+			sw.addEventListener('updatefound', function (){
+				console.log('Application found a new update on services worker');
+			});
+		});
+
+		// listen for controller change
+	    navigator.serviceWorker.addEventListener('controllerchange', function (){
+	        console.log('New service worker is now activated');
+	        window.location.reload();
+	    });
+
+	    // Are Notifications supported in the service worker?
+    	if (!('showNotification' in ServiceWorkerRegistration.prototype)) {
+	        console.warn('Notifications aren\'t supported.');
+	        return;
+	    }
+
+	    // Check the current Notification permission.
+	    // If its denied, it's a permanent block until the
+	    // user changes the permission
+	    if (Notification.permission === 'denied') {
+	        console.warn('The user has blocked notifications.');
+	        return;
+	    }
+
+	    // Check if push messaging is supported
+	    if (!('PushManager' in window)) {
+	        console.warn('Push messaging isn\'t supported.');
+	        return;
+	    }
+
+	    // We need the service worker registration to check for a subscription
+	    navigator.serviceWorker.ready.then(function(event) {
+	        console.log(event);
+	    });
     } else {
         console.warn('Service workers aren\'t supported in this browser.');
     }
 });
 
-// init page and register services worker
-if(navigator.serviceWorker){
-    // listen for controller change
-    navigator.serviceWorker.addEventListener('controllerchange', function (){
-        console.log('There is a change is government, the new services worker is taking over');
-        window.location.reload();
-    });
-}else{
-    console.log('browser does not support Services Worker !');
-}
+var deferredPrompt;
+window.addEventListener('beforeinstallprompt', function(e){
+  // Prevent Chrome 67 and earlier from automatically showing the prompt
+  e.preventDefault();
+  // Stash the event so it can be triggered later.
+  deferredPrompt = e;
+});
 
-// Once the service worker is registered set the initial state
-function initialiseState(sw) {
-    if(sw.waiting){
-        console.log('there is a waiting service worker...');
-        notifyMe(`info`, `You have new update on your application`);
-    }
-
-    if(sw.installing){
-        console.log('there is a service worker installing...');
-    }
-
-    if(sw.active){
-        console.log('there is an active services worker ');
-    }
-
-    if(sw){
-        sw.addEventListener('stateChange', function(event){
-            console.log('there is a new service worker process');
-            console.log(event.target.state);
-        })
-    }
-
-    // Are Notifications supported in the service worker?
-    if (!('showNotification' in ServiceWorkerRegistration.prototype)) {
-        console.warn('Notifications aren\'t supported.');
-        return;
-    }
-
-    // Check the current Notification permission.
-    // If its denied, it's a permanent block until the
-    // user changes the permission
-    if (Notification.permission === 'denied') {
-        console.warn('The user has blocked notifications.');
-        return;
-    }
-
-    // Check if push messaging is supported
-    if (!('PushManager' in window)) {
-        console.warn('Push messaging isn\'t supported.');
-        return;
-    }
-
-    // We need the service worker registration to check for a subscription
-    navigator.serviceWorker.ready.then(function(event) {
-        console.log(event);
+// install application
+function installApp() {
+    // run app installation
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      	if (choiceResult.outcome === 'accepted') {
+        	notifyMe("success", `Installation successful!`);
+      	} else {
+        	notifyMe("success", `You can always click install icon to install Sebastian`);
+      	}
+     	deferredPrompt = null;
     });
 }
+
 
 var user_id;
 var token;
@@ -268,26 +284,6 @@ var userUpdateProfile = (query) => {
 				'x-acces-token': token
 			},
 			body: JSON.stringify(query)
-		}).then(r => {
-			return r.json();
-		}).then(results => {
-			resolve(results);
-		}).catch(err => {
-			reject(JSON.stringify(err));
-		})
-	});
-}
-
-var uploadAvatar = (query) => {
-	return new Promise((resolve, reject) => {
-		fetch(`${config.endpoint}/media`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'user_id': user_id,
-				'x-acces-token': token
-			},
-			body: JSON.stringify({media_path})
 		}).then(r => {
 			return r.json();
 		}).then(results => {

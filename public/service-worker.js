@@ -10,6 +10,7 @@ var filesToCache = [
     'js/bootstrap.min.js',
     'js/numeral.js',
     'js/printme.js',
+    'js/script.js',
     'buy',
     'sell',
     'transaction',
@@ -19,12 +20,26 @@ var filesToCache = [
 
 var staticCacheName = `sebastianfx-cache-v1`;
 
-self.addEventListener('install', event => {
+self.addEventListener('install', function(event) {
     console.log('Ready to install service worker and cache static assets');
     event.waitUntil(
         caches.open(staticCacheName).then(cache => {
             console.log('Saving static assets... Completed!');
             return cache.addAll(filesToCache);
+        })
+    );
+});
+
+self.addEventListener('activate', function(event) {
+    event.waitUntil(
+        caches.keys().then(function(cacheNames){
+            return Promise.all(
+                cacheNames.filter(function(cacheName){
+                    return cacheName.startsWith('yeelda-') && cacheName !== appCacheName;
+                }).map(function(cacheName){
+                    return caches.delete(cacheName);
+                })
+            );
         })
     );
 });

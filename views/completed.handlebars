@@ -3,7 +3,7 @@
     <a class="navbar-brand text-white" href="/">
         <i class="material-icons">keyboard_backspace</i> <span class="text-white buy-title">Home</span>
     </a>
-    <span class="buy-title text-success">Completed Transactions</span>
+    <span class="buy-title text-success">Completed</span>
     <a href="javascript:void(0)">
         <i class="material-icons">perm_identity</i> <span class="agent-title">SB-A21884</span>
     </a>
@@ -11,226 +11,67 @@
 
 <div class="container-fluid main-contents" id="select-option">
     <div class="row">
-        <div class="col-md-6">
-            <div class="card-feel card-box text-center" style="padding-top: 20%;">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <!-- <span class="text-white">SEBASTIAN BDC</span> -->
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6" style="width: 50%;">
-                        <a href="/buy">
-                            <button class="btn btn-success" onsubmit="startBuy()" style="padding: 2rem;">
-                                <i class="material-icons">money</i> <span class="buy-title">BUY</span>
-                            </button>
-                        </a>
-                    </div>
-                    <div class="col-sm-6" style="width: 50%;">
-                        <a href="/sell">
-                            <button class="btn btn-danger" onsubmit="startSell()" style="padding: 2rem;">
-                               <i class="material-icons">money</i>  <span class="sell-title">SELL</span>
-                            </button>
-                        </a>
-                    </div>
+        <div class="col-md-12">
+            <table class="table small text-white">
+                <thead>
+                    <tr>
+                        <th width="30%">Name</th>
+                        <th width="50%">Consideration</th>
+                        <th width="5%">Currency</th>
+                        <th width="15%">Option</th>
+                    </tr>
+                </thead>
+                <tbody id="load-all-completed-transactions"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- preview transaction -->
+<div class="modal fade" id="show-completed-preview-transaction" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="transaction-title"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="show-transaction-data"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="pull-right">
+                    <button class="btn btn-flat" type="button" data-dismiss="modal">
+                        close
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="container-fluid main-contents" id="main-contents">
-    <form method="POST" onsubmit="return saveToQueue()">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card-feel card-box">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <h5>Customer</h5>
-                        </div>
-                    </div>
-                    <hr />
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="customer_name">Names</label>
-                                <input type="text" onblur="previewCustomerName()" class="form-control input-classic" placeholder="Eg, Suleiman Frank" id="customer_name" required="">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="customer_phone">Phone Number</label>
-                                <input type="number" step="any" class="form-control input-classic" placeholder="Eg, 09090009000" id="customer_phone" onkeyup="validatePhoneNumber(this)" required="">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="customer_email">Email</label>
-                                <input type="email" class="form-control input-classic" placeholder="someone@domain.com" id="customer_email" required="">
-                            </div>
-                        </div>
-                    </div>
+<!-- preview receipt -->
+<div class="modal fade" id="show-completed-preview-modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="receipt-title">Preview</h4>
+            </div>
+            <div class="modal-body" id="printable-area">
+                <div id="show-preview-data"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="pull-right">
+                    <button class="btn btn-flat" type="button" data-dismiss="modal">
+                        close
+                    </button>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card-feel card-box">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <h5>Exchange</h5>
-                        </div>
-                    </div>
-                    <hr />
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="customer_currency">Currency</label>
-                                <select class="form-control text-primary" id="customer_currency" required="">
-                                    <option value="1">USD/NGN</option>
-                                    <option value="2">EUR/NGN</option>
-                                    <option value="3">GBP/NGN</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="customer_volume">Volume</label>
-                                <input type="text" pattern="[0-9.,]+" onblur="calculateEquivalent()" onkeyup="formatVolume(this)" step="any" min="0" id="customer_volume" class="form-control input-classic" placeholder="Eg, 1,000,000" required="">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="customer_rate">Rate</label>
-                                <input type="text" pattern="[0-9.,]+" onblur="calculateEquivalent()" onkeyup="formatRate(this)" step="any" min="0" id="customer_rate" class="form-control input-classic" placeholder="Eg, 360.00" value="0" required="">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group" id="exchange-preview"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card-feel card-box">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <h5>Pay <span id="preview-customer-name"></span></h5>
-                        </div>
-                    </div>
-                    <hr />
-                    <div class="row">
-                        <div class="col-sm-6" style="width: 50%;">
-                            <div class="form-group">
-                                <label for="pay_customer_cash">Cash</label>
-                                <input type="text" class="form-control input-classic" placeholder="0.00" id="pay_customer_cash">
-                            </div>
-                        </div>
-                        <div class="col-sm-6" style="width: 50%;">
-                            <div class="form-group">
-                                <label for="pay_customer_wire">Wire</label>
-                                <input type="text" onkeyup="togglePayWire()" class="form-control input-classic" placeholder="0.00" id="pay_customer_wire">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="pay_customer_bank_name">Bank Name</label>
-                                <select class="form-control" id="pay_customer_bank_name">
-                                    <option value="">Select Bank</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="customer_currency">Account Number</label>
-                                <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="customer_bank_nuban">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card-feel card-box">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <h5>Receive - SEBASTIAN BDC</h5>
-                        </div>
-                    </div>
-                    <hr />
-                    <div class="row">
-                        <div class="col-sm-6" style="width: 50%;">
-                            <div class="form-group">
-                                <label for="pay_customer_cash">Cash</label>
-                                <input type="text" class="form-control input-classic" placeholder="0.00" id="receive_customer_cash">
-                            </div>
-                        </div>
-                        <div class="col-sm-6" style="width: 50%;">
-                            <div class="form-group">
-                                <label for="pay_customer_cash">Wire</label>
-                                <input type="text" class="form-control input-classic" placeholder="0.00" id="receive_customer_wire">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="receive_bank_name">Bank Name</label>
-                                <select class="form-control" id="receive_bank_name">
-                                    <option value="">Select Bank</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="receive_bank_nuban">Account Number</label>
-                                <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="receive_bank_nuban">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
+    </div>
 </div>
 
-
-<script type="text/javascript">
-    // $("#start-sell").click(function () {
-    //     $("#main-contents").show();
-    //     $("#select-option").hide();
-    // })
-
-    // $("#start-buy").click(function () {
-    //     $("#main-contents").show();
-    //     $("#select-option").hide();
-    // })
-    function startSell() {
-        $("#main-contents").show();
-        $("#select-option").hide();
+<style type="text/css">
+    body {
+        background-color: #0c1654;
+        color: #fff;
     }
-
-    function startBuy() {
-        $("#main-contents").show();
-        $("#select-option").hide();
-    }
-</script>
+</style>
