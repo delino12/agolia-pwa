@@ -949,9 +949,9 @@ function syncTransaction(trans_id) {
 	`);
 
 	getOneTransaction(trans_id).then(transaction => {
-		console.log(transaction);
+		// console.log(transaction);
 		$.ajax({
-  			url: 'http://localhost:8181/api/save/transaction',
+  			url: 'https://canary.timsmate.com/api/save/transaction',
   			type: 'POST',
   			dataType: 'json',
   			data: transaction,
