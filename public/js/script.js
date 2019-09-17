@@ -738,17 +738,17 @@ function getAllTransactions(start = 0, total = 10) {
 				                    ${val.name}
 				                </a> 
 				            </td>
-				            <td>${val.consideration} <br /> (${val.volume} * ${val.rate})</td>
+				            <td>${numeral(val.consideration).format('0,0.00')} <br /> (${numeral(val.volume).format('0,0.00')} * ${numeral(val.rate).format('0,0.00')})</td>
 				            <td>${val.currency}</td>
 				            <td>
 				            	<a href="javascript:void(0);" ${shade} onclick="previewReceipt(${val.id})">
-				                    <i class="material-icons">print</i></a>
+				                    <i class="material-icons py-1">print</i></a>
 				                </a> 
 				                <a href="javascript:void(0);" ${shade} onclick="syncTransaction(${val.id})" id="sync-icon-${val.id}">
-				                	<i class="material-icons">cloud_upload</i>
+				                	<i class="material-icons py-1">cloud_upload</i>
 				                </a>
 				                <a href="javascript:void(0);" ${shade} onclick="deleteTransaction(${val.id})">
-				                <i class="material-icons">restore_from_trash</i></a>
+				                <i class="material-icons py-1">restore_from_trash</i></a>
 				            </td>
 				        </tr>
 				    `);
@@ -1114,7 +1114,7 @@ function previewReceipt(trans_id, trans_type) {
 					</tr>
 				</table>
 
-			<button class="btn btn-flat float-right" onclick="printReceipt()">
+			<button class="btn btn-flat float-right" onclick="printReceipt()" id="print-deal-slip">
 				<i class="material-icons">print</i> <span class="print-title">Receipt</span>
 			</button>
 		`);
@@ -1142,8 +1142,9 @@ function getBankByCode(bank_code) {
 }
 
 function printReceipt() {
+	$("#print-deal-slip").hide();
 	$("#printable-area").printMe({
-		"path": ["css/bootstrap.css", "css/style.css"],
+		"path": ["css/bootstrap.css"],
 		"title": "SB-BDC Receipt" 
 	});
 }

@@ -44,9 +44,9 @@
    "density": "4.0"
   }
  ],
-  "start_url": "/?homescreen=1",
+  "start_url": "/?source=pwa",
+  "background_color": "#2DA8CC",
   "display": "standalone",
-  "gcm_sender_id": "609036301851",
-  "theme_color": "#400505",
-  "background_color": "#400509"
+  "scope": "/",
+  "theme_color": "#2DA8CC"
 }
