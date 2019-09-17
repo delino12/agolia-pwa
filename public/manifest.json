@@ -44,7 +44,7 @@
    "density": "4.0"
   }
  ],
-  "start_url": "/?source=pwa",
+  "start_url": "/",
   "background_color": "#FFFFFF",
   "display": "standalone",
   "scope": "/",
