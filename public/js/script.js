@@ -110,7 +110,18 @@ function initLogin() {
     var password = $("#agent_login_pass").val();
 
     // process login
-    attempLogin(username, password);
+    attempLogin(username, password).then(status => {
+    	
+    	if(status == true){
+			window.location.reload();
+    	}else{
+    		// push notification
+			notifyMe("danger", "Invalid Agent-ID/Passcode, check credentials and try again!");
+    	}
+    }).catch(err => {
+    	// push notification
+		notifyMe("danger", "Invalid Agent-ID/Passcode, check credentials and try again!");
+    });
 
     // void form
     return false;
@@ -118,24 +129,31 @@ function initLogin() {
 
 // login agent
 function attempLogin(username, passcode) {
-	// body
-    fetch(`/users.json`).then(r => {
-    	return r.json();
-    }).then(results => {
-    	console.log(results);
-    	var users = results.data;
+	return new Promise((resolve, reject) => {
+		// body
+	    fetch(`/users.json`).then(r => {
+	    	return r.json();
+	    }).then(results => {
+	    	// console.log(results);
+	    	var users = results.data;
+	    	let isMatch = false;
 
-    	for(var i =0; i < users.length; i++) {
-	        if(username == users[i].agent_id && passcode == users[i].password){
-	            sessionStorage.setItem("username", username);
-	            window.location.reload();
-	        }
-	    } 
-	    // push notification
-	    notifyMe("danger", "Invalid Agent-ID/Passcode, check credentials and try again!");
-    }).catch(err => {
-    	console.log(JSON.stringify(err));
-    })  
+	    	for(var i =0; i < users.length; i++) {
+		        if(username == users[i].agent_id && passcode == users[i].password){
+		            sessionStorage.setItem("username", username);
+		            isMatch = true;
+		        }
+		    } 
+
+		    if(isMatch == true){
+		    	resolve(true);
+		    }else{
+		    	resolve(false)
+		    }
+	    }).catch(err => {
+	    	console.log(err);
+	    })  
+	})
 }
 
 function previewCustomerName() {
