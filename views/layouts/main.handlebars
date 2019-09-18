@@ -29,6 +29,7 @@
 		<script src="/js/jquery.min.js"></script>
 	</head>
 	<body>
+		<input type="hidden" id="agent_id" name="">
 		<div id="notification-wrapper">
 			<div class="notification-body">
 				Hello
@@ -44,11 +45,11 @@
 	    <!-- Custom JS -->
 	    <script src="/js/script.js"></script>
 	    <script type="text/javascript">
-	    	if(sessionStorage.length > 0){
-		        var agent_id    = sessionStorage.key(0);
-		        var agent_code  = sessionStorage.getItem(agent_id);
+	    	agentUsername();
+
+	    	if(sessionStorage.username){
 		        // console.log(agent_code);
-		        $("#agent_id").val(agent_code);
+		        $("#agent_id").val(sessionStorage.username);
 		       	$("#user-dashboard").show();
 		       	$("#user-login").hide();
 		    }else{
@@ -59,6 +60,11 @@
 		    function logout() {
 		        sessionStorage.clear();
 		        window.location.reload();
+		    }
+
+		    // get agent username
+		    function agentUsername() {
+		    	$(".agent-title").html(sessionStorage.username);
 		    }
 	    </script>
 	</body>
