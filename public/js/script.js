@@ -318,8 +318,9 @@ function saveToQueue() {
 	var trade_type          = $("#trade_type").val();
 	var created_at          = current_date;
 	var updated_at          = current_date;
-	var updated_by          = "SB-A21884";
-	var created_by          = "SB-A21884";
+	var updated_by          = $("#agent_id").val();
+	var created_by          = $("#agent_id").val();
+	var comment  			= $("#agent_comment").val();
 	var document_file       = $("#document_file").val();
 
 	// trim numeric value
@@ -361,7 +362,7 @@ function saveToQueue() {
 		}
     }
 
-	var query = {name, email, phone, currency, volume, rate, pay_cash, pay_wire, pay_bank_name, pay_bank_nuban, receive_cash, receive_wire, receive_bank_name, receive_bank_nuban, consideration, trade_type, created_at, updated_at, created_by, updated_by, document_file}
+	var query = {name, email, phone, currency, volume, rate, pay_cash, pay_wire, pay_bank_name, pay_bank_nuban, receive_cash, receive_wire, receive_bank_name, receive_bank_nuban, consideration, trade_type, created_at, updated_at, created_by, updated_by, document_file, comment}
 	// console.log(query);
 
 	// save to offline db
