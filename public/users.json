@@ -1,0 +1,76 @@
+{
+  "status": true,
+  "message": "Users retrieved",
+  "data": [
+    {
+      "name": "SEB-BDC 1",
+      "agent_id": "SB-A21884",
+      "password": "044150149"
+    },
+    {
+      "name": "SEB-BDC 2",
+      "agent_id": "SB-A21063",
+      "password": "063150162"
+    },
+    {
+      "name": "SEB-BDC 3",
+      "agent_id": "SB-A03511",
+      "password": "035150103"
+    },
+    {
+      "name": "SEB-BDC 4",
+      "agent_id": "SB-A03511",
+      "password": "023150005"
+    },
+    {
+      "name": "SEB-BDC 5",
+      "agent_id": "SB-A02514",
+      "password": "050150010"
+    },
+    {
+      "name": "SEB-BDC 6",
+      "agent_id": "SB-A06514",
+      "password": "060160211"
+    },
+    {
+      "name": "SEB-BDC 7",
+      "agent_id": "SB-A06507",
+      "password": "070150003"
+    },
+    {
+      "name": "SEB-BDC 8",
+      "agent_id": "SB-A22334",
+      "password": "044344049"
+    },
+    {
+      "name": "SEB-BDC 9",
+      "agent_id": "SB-A21063",
+      "password": "631503962"
+    },
+    {
+      "name": "SEB-BDC 10",
+      "agent_id": "SB-A203331",
+      "password": "235153034"
+    },
+    {
+      "name": "SEB-BDC 11",
+      "agent_id": "SB-A35777",
+      "password": "923159035"
+    },
+    {
+      "name": "SEB-BDC 12",
+      "agent_id": "SB-A388594",
+      "password": "050150010"
+    },
+    {
+      "name": "SEB-BDC 13",
+      "agent_id": "SB-A11214",
+      "password": "110168211"
+    },
+    {
+      "name": "SEB-BDC 14",
+      "agent_id": "SB-A343431",
+      "password": "073115443"
+    }
+  ]
+}

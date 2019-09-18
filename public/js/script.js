@@ -65,10 +65,10 @@ window.addEventListener('load', function(){
 
 var deferredPrompt;
 window.addEventListener('beforeinstallprompt', function(e){
-  // Prevent Chrome 67 and earlier from automatically showing the prompt
-  e.preventDefault();
-  // Stash the event so it can be triggered later.
-  deferredPrompt = e;
+  	// Prevent Chrome 67 and earlier from automatically showing the prompt
+  	e.preventDefault();
+  	// Stash the event so it can be triggered later.
+	deferredPrompt = e;
 });
 
 // install application
@@ -85,113 +85,57 @@ function installApp() {
     });
 }
 
-
 var user_id;
 var token;
 var current_date = new Date();
 
-function navigateTo(args) {
-	// body...
-	switch(args) {
-		case 'profile':
-			// code block
-			$("#timeline-contents").hide();
-			$("#message-contents").hide();
-			$("#profile-contents").show();
-			$("#settings-contents").hide();
-			$("#followers-contents").hide();
-			$("#comments-contents").hide();
-			$("#favorite-contents").hide();
-			break;
-		case 'home':
-			// code block
-			$("#timeline-contents").show();
-			$("#message-contents").hide();
-			$("#profile-contents").hide();
-			$("#settings-contents").hide();
-			$("#followers-contents").hide();
-			$("#favorite-contents").hide();
-			$("#comments-contents").hide();
-			break;
-		case 'followers':
-			// code block
-			$("#timeline-contents").hide();
-			$("#message-contents").hide();
-			$("#profile-contents").hide();
-			$("#settings-contents").hide();
-			$("#followers-contents").show();
-			$("#favorite-contents").hide();
-			$("#comments-contents").hide();
-			break;
-		case 'message':
-			// code block
-			$("#timeline-contents").hide();
-			$("#message-contents").show();
-			$("#profile-contents").hide();
-			$("#settings-contents").hide();
-			$("#followers-contents").hide();
-			$("#favorite-contents").hide();
-			$("#comments-contents").hide();
-			break;
-		case 'comments':
-			// code block
-			$("#timeline-contents").hide();
-			$("#message-contents").hide();
-			$("#profile-contents").hide();
-			$("#settings-contents").hide();
-			$("#followers-contents").hide();
-			$("#favorite-contents").hide();
-			$("#comments-contents").show();
-			break;
-		case 'favorite':
-			// code block
-			$("#timeline-contents").hide();
-			$("#message-contents").hide();
-			$("#profile-contents").hide();
-			$("#settings-contents").hide();
-			$("#followers-contents").hide();
-			$("#favorite-contents").hide();
-			$("#comments-contents").show();
-			break;
-		case 'media':
-			// code block
-			openMediaGallery();
-			break;
-
-		default:
-			// code block
-	}
+// check login state
+function auth(username) {
+    // body...
+    var sessionDB = window.sessionStorage;
+    for(var i =0; i < seessionDB.length; i++){
+        let key     = sessionDB.key(i);
+        let value   = sessionDB.getItem(key);
+        if(username == value){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
 
-function navigateToAuth(args) {
-	// body...
-	switch(args) {
-		case 'login':
-			// code block
-			$("#login-contents").show();
-			$("#register-contents").hide();
-			$("#reset-contents").hide();
-			break;
-		case 'register':
-			// code block
-			$("#login-contents").hide();
-			$("#register-contents").show();
-			$("#reset-contents").hide();
-			break;
-		case 'reset':
-			// code block
-			$("#login-contents").hide();
-			$("#register-contents").hide();
-			$("#reset-contents").show();
-			break;
-		default:
-			// code block
-	}
+// trigger login
+function initLogin() {
+    var username = $("#agent_login_id").val();
+    var password = $("#agent_login_pass").val();
+
+    // process login
+    attempLogin(username, password);
+
+    // void form
+    return false;
 }
 
-function openMediaGallery() {
-	// media gallery
-	$("#open-media").trigger('click');
+// login agent
+function attempLogin(username, passcode) {
+	// body
+    fetch(`/users.json`).then(r => {
+    	return r.json();
+    }).then(results => {
+    	console.log(results);
+    	var users = results.data;
+
+    	for(var i =0; i < users.length; i++) {
+	        if(username == users[i].agent_id && passcode == users[i].password){
+	            sessionStorage.setItem("username", username);
+	            window.location.reload();
+	        }
+	    } 
+	    // push notification
+	    notifyMe("danger", "Invalid Agent-ID/Passcode, check credentials and try again!");
+    }).catch(err => {
+    	console.log(JSON.stringify(err));
+    })  
 }
 
 function previewCustomerName() {
@@ -221,90 +165,11 @@ function processUserLogin() {
 
 /*
 |-----------------------------------------
-| API SECTIONS
-|-----------------------------------------
-*/
-var registerUser = (query) => {
-	return new Promise((resolve, reject) => {
-		fetch(`${config.endpoint}/user`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(query)
-		}).then(r => r.json()).then(results => {
-			console.log(results)
-			resolve(results);
-		}).catch(err => {
-			console.log(err)
-			reject(JSON.stringify(err));
-		})
-	});
-}
-
-var loginUser = (query) => {
-	return new Promise((resolve, reject) => {
-		fetch(`${config.endpoint}/auth`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(query)
-		}).then(r => r.json()).then(results => {
-			resolve(results);
-		}).catch(err => {
-			console.log(err)
-			reject(JSON.stringify(err));
-		})
-	});
-}
-
-var userProfile = (query) => {
-	// console.log('hello');
-	return new Promise((resolve, reject) => {
-		fetch(`${config.endpoint}/user/${LocalStorage.getItem('user_id')}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'user_id': user_id,
-				'x-acces-token': token
-			}
-		}).then(r => {
-			return r.json();
-		}).then(results => {
-			resolve(results);
-		}).catch(err => {
-			reject(JSON.stringify(err));
-		})
-	});
-}
-
-var userUpdateProfile = (query) => {
-	return new Promise((resolve, reject) => {
-		fetch(`${config.endpoint}/user/${LocalStorage.getItem('user_id')}`, {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json',
-				'user_id': user_id,
-				'x-acces-token': token
-			},
-			body: JSON.stringify(query)
-		}).then(r => {
-			return r.json();
-		}).then(results => {
-			resolve(results);
-		}).catch(err => {
-			reject(JSON.stringify(err));
-		})
-	});
-}
-
-/*
-|-----------------------------------------
 | FORMAT VOLUME INPUT
 |-----------------------------------------
 */
 function formatVolume(element) {
+	// body
     return element.value = numeral(element.value).format('0,0');
 }
 
@@ -314,6 +179,7 @@ function formatVolume(element) {
 |-----------------------------------------
 */
 function formatRate(element) {
+	// body
     return element.value = numeral(parseFloat(element.value)).format('0,0');
 }
 
@@ -370,12 +236,13 @@ function togglePayWire() {
 }
 
 function togglePayCash() {
-	// var pay_wire = $("#pay_customer_wire").val();
-
+	// body
+	var pay_wire = $("#pay_customer_wire").val();
 }
 
 function toggleBalanceReceive() {
 	// toggle balancing
+	var balance = "";
 }
 
 function validatePhoneNumber(element) {
@@ -612,7 +479,7 @@ getAllTransactions(0, 10);
 
 /*
 |-----------------------------------------
-| GET AND OPEN DATABASE
+| DATABASE SECTION
 |-----------------------------------------
 */
 if (!window.indexedDB) {
@@ -967,6 +834,9 @@ function syncTransaction(trans_id) {
 					$(`#sync-icon-${trans_id}`).html(`
 						<i class="material-icons">cloud_done</i>
 					`);
+
+					// lose cargo
+					deleteTransaction(trans_id);
   				}else{
   					notifyMe("danger", data.message);
 					$(`#sync-icon-${trans_id}`).html(`

@@ -16,6 +16,7 @@ var filesToCache = [
     'sell',
     'transaction',
     'completed',
+    'users.json',
     'banks.json'
 ];
 

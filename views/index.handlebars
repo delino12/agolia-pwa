@@ -1,91 +1,134 @@
-<nav class="navbar navbar-expand-md card-feel" style="background-color: #0c1654;color: #FFF;">
-    <!-- Brand -->
-    <a class="navbar-brand text-white" href="#" data-toggle="collapse" data-target="#collapsibleNavbar">
-        <img src="/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> <span class="text-white">SEBASTIAN BDC</span>
-    </a>
-    <a href="javascript:void(0)">
-        <i class="material-icons">perm_identity</i> <span class="agent-title">SB-A21884</span>
-    </a>
+<div id="user-dashboard" style="display: none;">
+    <nav class="navbar navbar-expand-md card-feel" style="background-color: #0c1654;color: #FFF;">
+        <!-- Brand -->
+        <a class="navbar-brand text-white" href="#" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <img src="/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> <span class="text-white">SEBASTIAN BDC</span>
+        </a>
+        <a href="javascript:void(0)">
+            <i class="material-icons">perm_identity</i> <span class="agent-title">SB-A21884</span>
+        </a>
 
-    <!-- Navbar links -->
-    <div class="collapse navbar-collapse" id="collapsibleNavbar">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link text-success" href="/buy">
-                    <i class="material-icons">sync_alt</i> <span class="buy-title">BUY</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-danger" href="/sell">
-                    <i class="material-icons">sync_alt</i> <span class="sell-title">SELL</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="/transaction">
-                    <i class="material-icons">payment</i> <span class="transaction-title">TRANSACTIONS</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="/completed">
-                    <i class="material-icons">file_copy</i> <span class="transaction-completed-title">COMPLETED</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="#">
-                    <i class="material-icons">exit_to_app</i> <span class="logout-title">LOGOUT</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-</nav>
+        <!-- Navbar links -->
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/transaction">
+                        <i class="material-icons">payment</i> <span class="transaction-title">PENDING</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/completed">
+                        <i class="material-icons">file_copy</i> <span class="transaction-completed-title">COMPLETED</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="javascript:void(0);" onclick="logout()">
+                        <i class="material-icons">exit_to_app</i> <span class="logout-title">LOGOUT</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-<div class="container-fluid main-contents" id="select-option">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card-feel card-box text-center" style="padding-top: 20%;min-height: 300px;">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <!-- <span class="text-white">SEBASTIAN BDC</span> -->
+    <div class="container-fluid main-contents" id="select-option">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card-feel card-box text-center" style="padding-top: 20%;min-height: 300px;">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <!-- <span class="text-white">SEBASTIAN BDC</span> -->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6" style="width: 50%;">
+                            <a href="/buy">
+                                <button class="btn btn-success" onsubmit="startBuy()" style="padding: 2rem;">
+                                    <i class="material-icons">money</i> <span class="buy-title">BUY</span>
+                                </button>
+                            </a>
+                        </div>
+                        <div class="col-sm-6" style="width: 50%;">
+                            <a href="/sell">
+                                <button class="btn btn-danger" onsubmit="startSell()" style="padding: 2rem;">
+                                   <i class="material-icons">money</i>  <span class="sell-title">SELL</span>
+                                </button>
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm-6" style="width: 50%;">
-                        <a href="/buy">
-                            <button class="btn btn-success" onsubmit="startBuy()" style="padding: 2rem;">
-                                <i class="material-icons">money</i> <span class="buy-title">BUY</span>
-                            </button>
-                        </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card-feel card-box text-center" style="padding-top: 20%;min-height: 300px;">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <span class="btn btn-link text-white">Pending</span>
+                            <h3 class="total-transactions"></h3>
+                        </div>
                     </div>
-                    <div class="col-sm-6" style="width: 50%;">
-                        <a href="/sell">
-                            <button class="btn btn-danger" onsubmit="startSell()" style="padding: 2rem;">
-                               <i class="material-icons">money</i>  <span class="sell-title">SELL</span>
-                            </button>
-                        </a>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <span class="btn btn-link text-white">Completed</span>
+                            <h3 class="">Total: 0</h3>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card-feel card-box text-center" style="padding-top: 20%;min-height: 300px;">
-                <div class="row">
-                    <div class="col-sm-4">
-                        <span class="btn btn-link text-white">Total Pending</span>
+</div>
+
+<div id="user-login" class="container">
+    <form method="POST" onsubmit="return initLogin()" id="transaction-form">
+        <div class="row">
+            <div class="col-sm-12 text-center py-5">
+                <img src="/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> <br /> <span class="text-white">SEBASTIAN BDC</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card-feel card-box">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h5>Login</h5>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4">
-                        <span class="btn btn-link text-white">Total Sent</span>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="agent_login_id">Agent ID</label>
+                                <input type="text" class="form-control input-classic" placeholder="Eg, SB-A00000" id="agent_login_id" required="">
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4">
-                        <span class="btn btn-link text-white">Total Approved</span>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="agent_login_pass">Password</label>
+                                <input type="password" class="form-control input-classic" placeholder="********" id="agent_login_pass" required="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <!-- <label for="agent_login_pass">Password</label> -->
+                                <button class="btn btn-primary">Login</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+
+        <div class="row">
+            <div class="col-sm-12 text-center py-5">
+               <p class="foot-note">Developed by Cavidel Limited</p>
+            </div>
+        </div>
+    </form>
 </div>

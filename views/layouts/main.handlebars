@@ -43,5 +43,23 @@
 	    <script src="/js/printme.js"></script>
 	    <!-- Custom JS -->
 	    <script src="/js/script.js"></script>
+	    <script type="text/javascript">
+	    	if(sessionStorage.length > 0){
+		        var agent_id    = sessionStorage.key(0);
+		        var agent_code  = sessionStorage.getItem(agent_id);
+		        // console.log(agent_code);
+		        $("#agent_id").val(agent_code);
+		       	$("#user-dashboard").show();
+		       	$("#user-login").hide();
+		    }else{
+		       	$("#user-login").show();
+		    }
+
+		    // logout user
+		    function logout() {
+		        sessionStorage.clear();
+		        window.location.reload();
+		    }
+	    </script>
 	</body>
 </html>
