@@ -376,7 +376,6 @@ function togglePayCash() {
 
 function toggleBalanceReceive() {
 	// toggle balancing
-
 }
 
 function validatePhoneNumber(element) {
@@ -520,7 +519,7 @@ function resetWorker() {
 function setDefaultCurrency() {
 	var currency = $("#customer_currency").val();
 	var trade_type = $("#trade_type").val();
-	if(currency == "1") {
+	if(currency == "2") {
 		if(trade_type == "1"){
 			$("#preview-pay-currency").html(`
 				NGN
@@ -531,23 +530,6 @@ function setDefaultCurrency() {
 		}else if(trade_type == "2"){
 			$("#preview-pay-currency").html(`
 				USD
-			`);
-			$("#preview-receive-currency").html(`
-				NGN
-			`);
-		}
-	}
-	if(currency == "2"){
-		if(trade_type == "1"){
-			$("#preview-pay-currency").html(`
-				NGN
-			`);
-			$("#preview-receive-currency").html(`
-				EUR
-			`);
-		}else if(trade_type == "2"){
-			$("#preview-pay-currency").html(`
-				EUR
 			`);
 			$("#preview-receive-currency").html(`
 				NGN
@@ -565,6 +547,23 @@ function setDefaultCurrency() {
 		}else if(trade_type == "2"){
 			$("#preview-pay-currency").html(`
 				GBP
+			`);
+			$("#preview-receive-currency").html(`
+				NGN
+			`);
+		}
+	}
+	if(currency == "4"){
+		if(trade_type == "1"){
+			$("#preview-pay-currency").html(`
+				NGN
+			`);
+			$("#preview-receive-currency").html(`
+				EUR
+			`);
+		}else if(trade_type == "2"){
+			$("#preview-pay-currency").html(`
+				EUR
 			`);
 			$("#preview-receive-currency").html(`
 				NGN
@@ -738,9 +737,9 @@ function getAllTransactions(start = 0, total = 10) {
 				$("#load-all-transactions").html("");
 				$.each(transactions_box, function(index, val) {
 				    sn++;
-				    if(val.currency == "1"){
+				    if(val.currency == "2"){
 				    	val.currency = "USD";
-				    }else if(val.currency == "2"){
+				    }else if(val.currency == "4"){
 				    	val.currency = "EUR";
 				    }else if(val.currency == "3"){
 				    	val.currency = "GBP";
@@ -812,11 +811,11 @@ function getOneTransaction(trans_id) {
 // view transaction
 function viewTransaction(trans_id) {
 	getOneTransaction(trans_id).then(async transaction => {
-		if(transaction.currency == "1"){
+		if(transaction.currency == "2"){
 			transaction.currency = "USD - Dollar";
-		}else if(transaction.currency == "2"){
+		}else if(transaction.currency == "4"){
 			transaction.currency = "EUR - Euro";
-		}else if(transaction.currency == "1"){
+		}else if(transaction.currency == "3"){
 			transaction.currency = "GBP - Pounds";
 		}
 
@@ -1009,11 +1008,11 @@ function deleteTransaction(trans_id) {
 // view transaction
 function previewReceipt(trans_id, trans_type) {
 	getOneTransaction(trans_id).then(async transaction => {
-		if(transaction.currency == "1"){
+		if(transaction.currency == "2"){
 			transaction.currency = "USD - Dollar";
-		}else if(transaction.currency == "2"){
+		}else if(transaction.currency == "4"){
 			transaction.currency = "EUR - Euro";
-		}else if(transaction.currency == "1"){
+		}else if(transaction.currency == "3"){
 			transaction.currency = "GBP - Pounds";
 		}
 

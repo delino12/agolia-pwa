@@ -1,5 +1,6 @@
 var filesToCache = [
     '/',
+    'favicon.ico',
     'img/android-icon-48x48.png',
     'css/bootstrap.min.css',
     'css/style.css',
