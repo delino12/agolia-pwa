@@ -1026,12 +1026,31 @@ function previewReceipt(trans_id, trans_type) {
 					</tr>
 				</table>
 
-			<button class="btn btn-flat float-right" onclick="printReceipt()" id="print-deal-slip">
+			<button class="btn btn-flat float-right" onclick="PrintElem()" id="print-deal-slip">
 				<i class="material-icons">print</i> <span class="print-title">Receipt</span>
 			</button>
 		`);
 		$("#show-preview-modal").modal();
 	})
+}
+
+function PrintElem(){
+	$("#print-deal-slip").hide();
+    var mywindow = window.open('', 'PRINT', 'height=400,width=600');
+
+    mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+    mywindow.document.write('</head><body >');
+    mywindow.document.write('<h1>' + document.title  + '</h1>');
+    mywindow.document.write(document.getElementById("show-preview-data").innerHTML);
+    mywindow.document.write('</body></html>');
+
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
+
+    mywindow.print();
+    mywindow.close();
+
+    return true;
 }
 
 // get bank name
