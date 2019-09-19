@@ -1034,6 +1034,7 @@ function previewReceipt(trans_id, trans_type) {
 
 function emailReceipt(trans_id) {
 	// console.log(transaction);
+	$("#print-deal-slip").html('Sending...');
 	getOneTransaction(trans_id).then(async transaction => {
 		if(transaction.currency == "2"){
 			transaction.currency = "USD - Dollar";
@@ -1177,15 +1178,19 @@ function emailReceipt(trans_id) {
 			return r.json();
 		}).then(results => {
 			console.log(results)
+			if(results.status == "success"){
+				$("#print-deal-slip").html('Receipt sent!');
+			}
 		}).catch(err => {
-			console.log(JSON.stringify(err));
+			$("#print-deal-slip").html('Email Receipt');
+			console.log(err);
 		})
 	})
 }
 
 function PrintElem(){
 	$("#print-deal-slip").hide();
-    var mywindow = window.open('', 'PRINT', 'height=400,width=600');
+    var mywindow = window.open('', 'PRINT', 'height=700,width=400');
 
     mywindow.document.write('<html><head><title>' + document.title  + '</title>');
     mywindow.document.write('</head><body >');
