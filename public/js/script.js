@@ -1026,11 +1026,161 @@ function previewReceipt(trans_id, trans_type) {
 					</tr>
 				</table>
 
-			<button class="btn btn-flat float-right" onclick="PrintElem()" id="print-deal-slip">
-				<i class="material-icons">print</i> <span class="print-title">Receipt</span>
+			<button class="btn btn-flat float-right" onclick="emailReceipt(${trans_id})" id="print-deal-slip">
+				<i class="material-icons">email</i> <span class="print-title">Email Receipt</span>
 			</button>
 		`);
 		$("#show-preview-modal").modal();
+	})
+}
+
+function emailReceipt(trans_id) {
+	// console.log(transaction);
+	getOneTransaction(trans_id).then(async transaction => {
+		if(transaction.currency == "2"){
+			transaction.currency = "USD - Dollar";
+		}else if(transaction.currency == "4"){
+			transaction.currency = "EUR - Euro";
+		}else if(transaction.currency == "3"){
+			transaction.currency = "GBP - Pounds";
+		}
+
+		var pay_currency;
+		var receive_currency;
+
+		if(transaction.trade_type == "1"){
+			pay_currency = "NGN - Naira";
+			receive_currency = transaction.currency;
+			$("#receipt-title").html(`
+				<span class="text-success">Receipt</span>
+			`);
+			transaction.trade_type = "Sold";
+		}
+
+		if(transaction.trade_type == "2"){
+			pay_currency = transaction.currency;
+			receive_currency = "NGN - Naira";
+			$("#receipt-title").html(`
+				<span class="text-danger">Receipt</span>
+			`);
+			transaction.trade_type = "Purchased";
+		}
+
+		if(transaction.pay_bank_name){
+			transaction.pay_bank_name = await getBankByCode(transaction.pay_bank_name).then(bank_name => bank_name)
+		}
+
+		if(transaction.receive_bank_name){
+			transaction.receive_bank_name = await getBankByCode(transaction.receive_bank_name).then(bank_name => bank_name)
+		}
+
+		transaction.volume 		 = numeral(transaction.volume).format('0,0.00');
+		transaction.rate 		 = numeral(transaction.rate).format('0,0.00');
+		transaction.pay_cash	 = numeral(transaction.pay_cash).format('0,0.00');
+		transaction.pay_wire 	 = numeral(transaction.pay_wire).format('0,0.00');
+		transaction.receive_cash = numeral(transaction.receive_cash).format('0,0.00');
+		transaction.receive_wire = numeral(transaction.receive_wire).format('0,0.00');
+		transaction.consideration = numeral(transaction.consideration).format('0,0.00');
+
+		var data = `
+			<div class="text-center">
+				<img src="/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> <span class="text-primary">SEBASTIAN BDC</span>
+			</div>
+			<table class="table">
+				<tr>
+					<td>Customer</td>
+					<td>${transaction.name}</td>
+				</tr>
+				<tr>
+					<td>Transaction</td>
+					<td>${transaction.trade_type}</td>
+				</tr>
+				<tr>
+					<td>Currency</td>
+					<td>${transaction.currency}</td>
+				</tr>
+				<tr>
+					<td>Consideration</td>
+					<td>${transaction.consideration}</td>
+				</tr>
+				<tr>
+					<td>Agent ID</td>
+					<td>${transaction.updated_by}</td>
+				</tr>
+				<tr>
+					<td>Naration</td>
+					<td>${transaction.name} ${transaction.trade_type} ${transaction.volume} ${transaction.currency} </td>
+				</tr>
+				<tr>
+					<td>Date</td>
+					<td>${transaction.created_at}</td>
+				</tr>
+			</table>
+
+			<br /><br />
+			<table class="table">
+				<tr>
+					<td><b>Pay</b></td>
+					<td>${pay_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.pay_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.pay_wire}</td>
+				</tr>
+				<tr>
+					<td><b>Bank Name</b></td>
+					<td>${transaction.pay_bank_name}</td>
+				</tr>
+				<tr>
+					<td><b>Account NUBAN</b></td>
+					<td>${transaction.pay_bank_nuban}</td>
+				</tr>
+			</table>
+
+			<br /><br />
+			<table class="table">
+				<tr>
+					<td><b>Receive</b></td>
+					<td>${receive_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.receive_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.receive_wire}</td>
+				</tr>
+				<tr>
+					<td><b>Bank Name</b></td>
+					<td>${transaction.receive_bank_name}</td>
+				</tr>
+				<tr>
+					<td><b>Account NUBAN</b></td>
+					<td>${transaction.receive_bank_nuban}</td>
+				</tr>
+			</table>
+		`;
+
+		var query = {data}
+
+		fetch(`/receipt`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(query)
+		}).then(r => {
+			return r.json();
+		}).then(results => {
+			console.log(results)
+		}).catch(err => {
+			console.log(JSON.stringify(err));
+		})
 	})
 }
 
