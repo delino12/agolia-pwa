@@ -1088,31 +1088,31 @@ function emailReceipt(trans_id) {
 			</div>
 			<table class="table">
 				<tr>
-					<td>Customer</td>
+					<td><b>Customer</b></td>
 					<td>${transaction.name}</td>
 				</tr>
 				<tr>
-					<td>Transaction</td>
+					<td><b>Transaction</b></td>
 					<td>${transaction.trade_type}</td>
 				</tr>
 				<tr>
-					<td>Currency</td>
+					<td><b>Currency</b></td>
 					<td>${transaction.currency}</td>
 				</tr>
 				<tr>
-					<td>Consideration</td>
+					<td><b>Consideration</b></td>
 					<td>${transaction.consideration}</td>
 				</tr>
 				<tr>
-					<td>Agent ID</td>
+					<td><b>Agent ID</b></td>
 					<td>${transaction.updated_by}</td>
 				</tr>
 				<tr>
-					<td>Naration</td>
+					<td><b>Naration</b></td>
 					<td>${transaction.name} ${transaction.trade_type} ${transaction.volume} ${transaction.currency} </td>
 				</tr>
 				<tr>
-					<td>Date</td>
+					<td><b>Date</b></td>
 					<td>${transaction.created_at}</td>
 				</tr>
 			</table>
@@ -1136,7 +1136,7 @@ function emailReceipt(trans_id) {
 					<td>${transaction.pay_bank_name}</td>
 				</tr>
 				<tr>
-					<td><b>Account NUBAN</b></td>
+					<td><b>Account No</b></td>
 					<td>${transaction.pay_bank_nuban}</td>
 				</tr>
 			</table>
@@ -1160,13 +1160,13 @@ function emailReceipt(trans_id) {
 					<td>${transaction.receive_bank_name}</td>
 				</tr>
 				<tr>
-					<td><b>Account NUBAN</b></td>
+					<td><b>Account No</b></td>
 					<td>${transaction.receive_bank_nuban}</td>
 				</tr>
 			</table>
 		`;
-
-		var query = {data}
+		var to = transaction.email;
+		var query = {data, to}
 
 		fetch(`/receipt`, {
 			method: 'POST',
