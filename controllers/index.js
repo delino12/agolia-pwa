@@ -29,7 +29,7 @@ var receipt = async (req, res) => {
 	var template 	= req.body.data;
 
 	// console.log(req.body)
-	await mail.send(template, recipient).then(val => {
+	await mail.send2(template, recipient).then(val => {
 		res.status(200).json({status: "success", message: "Mail sent!", data: val});
 	}).catch(err => {
 		res.status(500).json({status: "error", message: "Mail not sent!", data: err});
