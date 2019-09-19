@@ -732,7 +732,6 @@ function viewTransaction(trans_id) {
 			transaction.receive_bank_name = await getBankByCode(transaction.receive_bank_name).then(bank_name => bank_name)
 		}
 
-
 		transaction.volume 		 = numeral(transaction.volume).format('0,0.00');
 		transaction.rate 		 = numeral(transaction.rate).format('0,0.00');
 		transaction.pay_cash	 = numeral(transaction.pay_cash).format('0,0.00');
@@ -741,7 +740,6 @@ function viewTransaction(trans_id) {
 		transaction.receive_wire = numeral(transaction.receive_wire).format('0,0.00');
 		transaction.consideration = numeral(transaction.consideration).format('0,0.00');
 		
-		console.log(transaction);
 		$("#show-transaction-data").html(`
 			<table class="table">
 				<tr>
@@ -776,10 +774,10 @@ function viewTransaction(trans_id) {
 					<td><b>Date</b></td>
 					<td>${transaction.created_at}</td>
 				</tr>
-			</table>
-
-			<br /><br />
-			<table class="table">
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
 				<tr>
 					<td><b>Pay</b></td>
 					<td>${pay_currency}</td>
@@ -797,13 +795,13 @@ function viewTransaction(trans_id) {
 					<td>${transaction.pay_bank_name}</td>
 				</tr>
 				<tr>
-					<td><b>Account NUBAN</b></td>
+					<td><b>Account No</b></td>
 					<td>${transaction.pay_bank_nuban}</td>
 				</tr>
-			</table>
-
-			<br /><br />
-			<table class="table">
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
 				<tr>
 					<td><b>Receive</b></td>
 					<td>${receive_currency}</td>
@@ -821,7 +819,7 @@ function viewTransaction(trans_id) {
 					<td>${transaction.receive_bank_name}</td>
 				</tr>
 				<tr>
-					<td><b>Account NUBAN</b></td>
+					<td><b>Account No</b></td>
 					<td>${transaction.receive_bank_nuban}</td>
 				</tr>
 			</table>
@@ -949,82 +947,82 @@ function previewReceipt(trans_id, trans_type) {
 			</div>
 			<table class="table">
 				<tr>
-					<td>Customer</td>
+					<td><b>Customer</b></td>
 					<td>${transaction.name}</td>
 				</tr>
 				<tr>
-					<td>Transaction</td>
+					<td><b>Transaction</b></td>
 					<td>${transaction.trade_type}</td>
 				</tr>
 				<tr>
-					<td>Currency</td>
+					<td><b>Currency</b></td>
 					<td>${transaction.currency}</td>
 				</tr>
 				<tr>
-					<td>Consideration</td>
+					<td><b>Consideration</b></td>
 					<td>${transaction.consideration}</td>
 				</tr>
 				<tr>
-					<td>Agent ID</td>
+					<td><b>Agent ID</b></td>
 					<td>${transaction.updated_by}</td>
 				</tr>
 				<tr>
-					<td>Naration</td>
+					<td><b>Naration</b></td>
 					<td>${transaction.name} ${transaction.trade_type} ${transaction.volume} ${transaction.currency} </td>
 				</tr>
 				<tr>
-					<td>Date</td>
+					<td><b>Date</b></td>
 					<td>${transaction.created_at}</td>
 				</tr>
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>Pay</b></td>
+					<td>${pay_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.pay_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.pay_wire}</td>
+				</tr>
+				<tr>
+					<td><b>Bank Name</b></td>
+					<td>${transaction.pay_bank_name}</td>
+				</tr>
+				<tr>
+					<td><b>Account No</b></td>
+					<td>${transaction.pay_bank_nuban}</td>
+				</tr>
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>Receive</b></td>
+					<td>${receive_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.receive_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.receive_wire}</td>
+				</tr>
+				<tr>
+					<td><b>Bank Name</b></td>
+					<td>${transaction.receive_bank_name}</td>
+				</tr>
+				<tr>
+					<td><b>Account No</b></td>
+					<td>${transaction.receive_bank_nuban}</td>
+				</tr>
 			</table>
-
-			<br /><br />
-				<table class="table">
-					<tr>
-						<td><b>Pay</b></td>
-						<td>${pay_currency}</td>
-					</tr>
-					<tr>
-						<td><b>Cash</b></td>
-						<td>${transaction.pay_cash}</td>
-					</tr>
-					<tr>
-						<td><b>Wire</b></td>
-						<td>${transaction.pay_wire}</td>
-					</tr>
-					<tr>
-						<td><b>Bank Name</b></td>
-						<td>${transaction.pay_bank_name}</td>
-					</tr>
-					<tr>
-						<td><b>Account NUBAN</b></td>
-						<td>${transaction.pay_bank_nuban}</td>
-					</tr>
-				</table>
-
-				<br /><br />
-				<table class="table">
-					<tr>
-						<td><b>Receive</b></td>
-						<td>${receive_currency}</td>
-					</tr>
-					<tr>
-						<td><b>Cash</b></td>
-						<td>${transaction.receive_cash}</td>
-					</tr>
-					<tr>
-						<td><b>Wire</b></td>
-						<td>${transaction.receive_wire}</td>
-					</tr>
-					<tr>
-						<td><b>Bank Name</b></td>
-						<td>${transaction.receive_bank_name}</td>
-					</tr>
-					<tr>
-						<td><b>Account NUBAN</b></td>
-						<td>${transaction.receive_bank_nuban}</td>
-					</tr>
-				</table>
 
 			<button class="btn btn-flat float-right" onclick="emailReceipt(${trans_id})" id="print-deal-slip">
 				<i class="material-icons">email</i> <span class="print-title">Email Receipt</span>
@@ -1084,7 +1082,8 @@ function emailReceipt(trans_id) {
 
 		var data = `
 			<div class="text-center">
-				<img src="/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> <span class="text-primary">SEBASTIAN BDC</span>
+				<img src="https://sebastianfx.herokuapp.com/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> 
+				<h3 class="text-primary">SEBASTIAN BDC</h3>
 			</div>
 			<table class="table">
 				<tr>
@@ -1115,10 +1114,10 @@ function emailReceipt(trans_id) {
 					<td><b>Date</b></td>
 					<td>${transaction.created_at}</td>
 				</tr>
-			</table>
-
-			<br /><br />
-			<table class="table">
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
 				<tr>
 					<td><b>Pay</b></td>
 					<td>${pay_currency}</td>
@@ -1139,10 +1138,10 @@ function emailReceipt(trans_id) {
 					<td><b>Account No</b></td>
 					<td>${transaction.pay_bank_nuban}</td>
 				</tr>
-			</table>
-
-			<br /><br />
-			<table class="table">
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
 				<tr>
 					<td><b>Receive</b></td>
 					<td>${receive_currency}</td>
