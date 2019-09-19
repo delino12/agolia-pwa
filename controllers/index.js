@@ -25,7 +25,7 @@ var settings = (req, res) => {
 }
 
 var receipt = async (req, res) => {
-	var recipient 	= 'ekpoto.liberty@gmail.com';
+	var recipient 	= req.body.to;
 	var template 	= req.body.data;
 
 	// console.log(req.body)
