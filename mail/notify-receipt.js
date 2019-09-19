@@ -26,11 +26,11 @@ exports.send = function(template, recipient){
 						<link href='https://fonts.googleapis.com/css?family=Amiko' rel='stylesheet'>
 						<style type="text/css">
 							body {
-							    font-family: 'Open Sans';font-size: 12px;
+							    font-family: 'Open Sans';font-size: 10px;
 							}
 
 							table, td, th {    
-							    border: 1px solid #ddd;
+							    border: 0px solid #ddd;
 							    text-align: left;
 							}
 
@@ -50,7 +50,7 @@ exports.send = function(template, recipient){
 								font-family: 'Open Sans', sans-serif;
 							}
 						</style>
-						<div style="padding: 1rem; margin-left: 20%; margin-right: 20%; margin-top: 2%;">
+						<div style="padding: 0.5rem; margin-left: 10%; margin-right: 10%; margin-top: 2%;">
 		        			${template}
 		        		</div>
 		        	</body>

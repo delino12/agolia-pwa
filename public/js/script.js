@@ -1085,7 +1085,7 @@ function emailReceipt(trans_id) {
 				<img src="https://sebastianfx.herokuapp.com/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> 
 				<h3 class="text-primary">SEBASTIAN BDC</h3>
 			</div>
-			<table class="table">
+			<table class="table small">
 				<tr>
 					<td><b>Customer</b></td>
 					<td>${transaction.name}</td>
