@@ -115,7 +115,7 @@ exports.send2 = function(template, recipient){
 								font-family: 'Open Sans', sans-serif;
 							}
 						</style>
-						<div style="padding: 0.5rem; margin-left: 10%; margin-right: 10%; margin-top: 2%;">
+						<div style="border: 1px solid #999; border-radius: 5px; padding: 0.5rem; margin-left: 10%; margin-right: 10%; margin-top: 2%;">
 		        			${template}
 		        		</div>
 		        	</body>

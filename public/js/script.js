@@ -321,7 +321,8 @@ function saveToQueue() {
 	var updated_by          = $("#agent_id").val();
 	var created_by          = $("#agent_id").val();
 	var comment  			= $("#agent_comment").val();
-	var document_file       = $("#document_file").val();
+	var documents       	= files_box;
+	var email_addons        = email_fields_box;
 
 	// trim numeric value
 	consideration = consideration.replace(/,/g, "");
@@ -362,7 +363,7 @@ function saveToQueue() {
 		}
     }
 
-	var query = {name, email, phone, currency, volume, rate, pay_cash, pay_wire, pay_bank_name, pay_bank_nuban, receive_cash, receive_wire, receive_bank_name, receive_bank_nuban, consideration, trade_type, created_at, updated_at, created_by, updated_by, document_file, comment}
+	var query = {name, email, phone, currency, volume, rate, pay_cash, pay_wire, pay_bank_name, pay_bank_nuban, receive_cash, receive_wire, receive_bank_name, receive_bank_nuban, consideration, trade_type, created_at, updated_at, created_by, updated_by, documents, email_addons, comment}
 	// console.log(query);
 
 	// save to offline db
@@ -458,7 +459,7 @@ function setDefaultCurrency() {
 	}
 }
 
-var totalFileLimit = 1;
+var totalFileLimit = 3;
 var totalFileCount = 0;
 var files_box = [];
 function addCustomerFileInput() {
@@ -470,25 +471,55 @@ function addCustomerFileInput() {
 		return false
 	}else{
 		$("#customer_files").append(`
-			<input type="file" name="media_file" onchange="pushImageBinary()" class="form-control" />
+			<input type="file" id="customer_email_${totalEmailFieldFileCount}" onchange="pushImageBinary(this)" class="form-control" />
 		`);
 	}
 }
 
 // capture image preview
-function pushImageBinary(){
-    var file    = document.querySelector('input[type=file]').files[0];
+function pushImageBinary(element){
+	var file = element.files[0];
+    // var file    = document.querySelector('input[name=file]').files[0];
     var reader  = new FileReader();
 
     reader.onloadend = async function (e) {
        // console.log(reader.result);
-       $("#document_file").val(reader.result);
+       files_box.push({
+       	document_file: reader.result
+       });
+       // $("#document_file").val(reader.result);
     }
 
     if (file) {
        //reads the data as a URL
        reader.readAsDataURL(file);
     } 
+}
+
+var totalEmailFieldLimit = 3;
+var totalEmailFieldFileCount = 0;
+var email_fields_box = [];
+function addMoreEmailField() {
+	totalEmailFieldFileCount++;
+
+	if(totalEmailFieldFileCount > totalEmailFieldLimit){
+		notifyMe("info", `You have exceeded the email add-on limit, You can only add maximun of ${totalEmailFieldLimit} emails.`);
+		// return
+		return false
+	}else{
+		$("#email-addon").append(`
+			<br />
+			<input type="email" class="form-control input-classic" placeholder="someone@domain.com" onblur="pushExtraEmail(this)" required="">
+		`);
+	}
+}
+
+// push to image binary
+function pushExtraEmail(element) {
+	var email = element.value;
+	email_fields_box.push({
+		email: email
+	});
 }
 
 // get banks
@@ -905,6 +936,11 @@ function previewReceipt(trans_id, trans_type) {
 
 		var pay_currency;
 		var receive_currency;
+		var pay_title;
+		var receive_title;
+		var consid_currency_lite = "NGN";
+
+		var naration;
 
 		if(transaction.trade_type == "1"){
 			pay_currency = "NGN - Naira";
@@ -913,6 +949,8 @@ function previewReceipt(trans_id, trans_type) {
 				<span class="text-success">Receipt</span>
 			`);
 			transaction.trade_type = "Sold";
+			pay_title = "Receive";
+			receive_title = "Pay";
 		}
 
 		if(transaction.trade_type == "2"){
@@ -922,6 +960,8 @@ function previewReceipt(trans_id, trans_type) {
 				<span class="text-danger">Receipt</span>
 			`);
 			transaction.trade_type = "Purchased";
+			pay_title = "Pay";
+			receive_title = "Receive";
 		}
 
 		if(transaction.pay_bank_name){
@@ -939,47 +979,15 @@ function previewReceipt(trans_id, trans_type) {
 		transaction.receive_cash = numeral(transaction.receive_cash).format('0,0.00');
 		transaction.receive_wire = numeral(transaction.receive_wire).format('0,0.00');
 		transaction.consideration = numeral(transaction.consideration).format('0,0.00');
-		
-		console.log(transaction);
-		$("#show-preview-data").html(`
-			<div class="text-center">
-				<img src="/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> <span class="text-primary">SEBASTIAN BDC</span>
-			</div>
-			<table class="table">
-				<tr>
-					<td><b>Customer</b></td>
-					<td>${transaction.name}</td>
-				</tr>
-				<tr>
-					<td><b>Transaction</b></td>
-					<td>${transaction.trade_type}</td>
-				</tr>
-				<tr>
-					<td><b>Currency</b></td>
-					<td>${transaction.currency}</td>
-				</tr>
-				<tr>
-					<td><b>Consideration</b></td>
-					<td>${transaction.consideration}</td>
-				</tr>
-				<tr>
-					<td><b>Agent ID</b></td>
-					<td>${transaction.updated_by}</td>
-				</tr>
-				<tr>
-					<td><b>Naration</b></td>
-					<td>${transaction.name} ${transaction.trade_type} ${transaction.volume} ${transaction.currency} </td>
-				</tr>
-				<tr>
-					<td><b>Date</b></td>
-					<td>${transaction.created_at}</td>
-				</tr>
+
+		if(transaction.trade_type == "Sold"){
+			naration = `
 				<tr>
 					<td><br /><br /></td>
 					<td>------------</td>
 				</tr>
 				<tr>
-					<td><b>Pay</b></td>
+					<td><b>${pay_title}</b></td>
 					<td>${pay_currency}</td>
 				</tr>
 				<tr>
@@ -995,7 +1003,7 @@ function previewReceipt(trans_id, trans_type) {
 					<td>${transaction.pay_bank_name}</td>
 				</tr>
 				<tr>
-					<td><b>Account No</b></td>
+					<td><b>Account No.</b></td>
 					<td>${transaction.pay_bank_nuban}</td>
 				</tr>
 				<tr>
@@ -1003,7 +1011,7 @@ function previewReceipt(trans_id, trans_type) {
 					<td>------------</td>
 				</tr>
 				<tr>
-					<td><b>Receive</b></td>
+					<td><b>${receive_title}</b></td>
 					<td>${receive_currency}</td>
 				</tr>
 				<tr>
@@ -1019,8 +1027,96 @@ function previewReceipt(trans_id, trans_type) {
 					<td>${transaction.receive_bank_name}</td>
 				</tr>
 				<tr>
-					<td><b>Account No</b></td>
+					<td><b>Account No.</b></td>
 					<td>${transaction.receive_bank_nuban}</td>
+				</tr>
+			`
+		}else if(transaction.trade_type == "Purchased"){
+			naration = `
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>${receive_title}</b></td>
+					<td>${pay_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.pay_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.pay_wire}</td>
+				</tr>
+				<tr>
+					<td><b>Bank Name</b></td>
+					<td>${transaction.pay_bank_name}</td>
+				</tr>
+				<tr>
+					<td><b>Account No.</b></td>
+					<td>${transaction.pay_bank_nuban}</td>
+				</tr>
+
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>${pay_title}</b></td>
+					<td>${receive_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.receive_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.receive_wire}</td>
+				</tr>
+				<tr>
+					<td><b>Bank Name</b></td>
+					<td>${transaction.receive_bank_name}</td>
+				</tr>
+				<tr>
+					<td><b>Account No.</b></td>
+					<td>${transaction.receive_bank_nuban}</td>
+				</tr>
+			`
+		}
+		
+
+		$("#show-preview-data").html(`
+			<div class="text-center">
+				<img src="/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> <span class="text-primary">SEBASTIAN BDC</span>
+			</div>
+			<table class="table">
+				<tr>
+					<td><b>Customer</b></td>
+					<td>${transaction.name}</td>
+				</tr>
+				<tr>
+					<td><b>Transaction</b></td>
+					<td>${transaction.trade_type} ${transaction.volume} ${transaction.currency} @ ${transaction.rate} </td>
+				</tr>
+				<tr>
+					<td><b>Consideration</b></td>
+					<td>${consid_currency_lite} ${transaction.consideration}</td>
+				</tr>
+				<tr>
+					<td><b>Agent ID</b></td>
+					<td>${transaction.updated_by}</td>
+				</tr>
+				
+				${naration}
+
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>Date</b></td>
+					<td>${transaction.created_at}</td>
 				</tr>
 			</table>
 
@@ -1046,6 +1142,11 @@ function emailReceipt(trans_id) {
 
 		var pay_currency;
 		var receive_currency;
+		var pay_title;
+		var receive_title;
+		var consid_currency_lite = "NGN";
+
+		var naration;
 
 		if(transaction.trade_type == "1"){
 			pay_currency = "NGN - Naira";
@@ -1054,6 +1155,8 @@ function emailReceipt(trans_id) {
 				<span class="text-success">Receipt</span>
 			`);
 			transaction.trade_type = "Sold";
+			pay_title = "Receive";
+			receive_title = "Pay";
 		}
 
 		if(transaction.trade_type == "2"){
@@ -1063,6 +1166,8 @@ function emailReceipt(trans_id) {
 				<span class="text-danger">Receipt</span>
 			`);
 			transaction.trade_type = "Purchased";
+			pay_title = "Pay";
+			receive_title = "Receive";
 		}
 
 		if(transaction.pay_bank_name){
@@ -1081,46 +1186,14 @@ function emailReceipt(trans_id) {
 		transaction.receive_wire = numeral(transaction.receive_wire).format('0,0.00');
 		transaction.consideration = numeral(transaction.consideration).format('0,0.00');
 
-		var data = `
-			<div class="text-center">
-				<img src="https://sebastianfx.herokuapp.com/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> 
-				<h3 class="text-primary">SEBASTIAN BDC</h3>
-			</div>
-			<table class="table small">
-				<tr>
-					<td><b>Customer</b></td>
-					<td>${transaction.name}</td>
-				</tr>
-				<tr>
-					<td><b>Transaction</b></td>
-					<td>${transaction.trade_type}</td>
-				</tr>
-				<tr>
-					<td><b>Currency</b></td>
-					<td>${transaction.currency}</td>
-				</tr>
-				<tr>
-					<td><b>Consideration</b></td>
-					<td>${transaction.consideration}</td>
-				</tr>
-				<tr>
-					<td><b>Agent ID</b></td>
-					<td>${transaction.updated_by}</td>
-				</tr>
-				<tr>
-					<td><b>Naration</b></td>
-					<td>${transaction.name} ${transaction.trade_type} ${transaction.volume} ${transaction.currency} </td>
-				</tr>
-				<tr>
-					<td><b>Date</b></td>
-					<td>${transaction.created_at}</td>
-				</tr>
+		if(transaction.trade_type == "Sold"){
+			naration = `
 				<tr>
 					<td><br /><br /></td>
 					<td>------------</td>
 				</tr>
 				<tr>
-					<td><b>Pay</b></td>
+					<td><b>${pay_title}</b></td>
 					<td>${pay_currency}</td>
 				</tr>
 				<tr>
@@ -1136,7 +1209,7 @@ function emailReceipt(trans_id) {
 					<td>${transaction.pay_bank_name}</td>
 				</tr>
 				<tr>
-					<td><b>Account No</b></td>
+					<td><b>Account No.</b></td>
 					<td>${transaction.pay_bank_nuban}</td>
 				</tr>
 				<tr>
@@ -1144,7 +1217,7 @@ function emailReceipt(trans_id) {
 					<td>------------</td>
 				</tr>
 				<tr>
-					<td><b>Receive</b></td>
+					<td><b>${receive_title}</b></td>
 					<td>${receive_currency}</td>
 				</tr>
 				<tr>
@@ -1160,8 +1233,98 @@ function emailReceipt(trans_id) {
 					<td>${transaction.receive_bank_name}</td>
 				</tr>
 				<tr>
-					<td><b>Account No</b></td>
+					<td><b>Account No.</b></td>
 					<td>${transaction.receive_bank_nuban}</td>
+				</tr>
+			`
+		}else if(transaction.trade_type == "Purchased"){
+			naration = `
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>${receive_title}</b></td>
+					<td>${pay_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.pay_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.pay_wire}</td>
+				</tr>
+				<tr>
+					<td><b>Bank Name</b></td>
+					<td>${transaction.pay_bank_name}</td>
+				</tr>
+				<tr>
+					<td><b>Account No.</b></td>
+					<td>${transaction.pay_bank_nuban}</td>
+				</tr>
+
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>${pay_title}</b></td>
+					<td>${receive_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.receive_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.receive_wire}</td>
+				</tr>
+				<tr>
+					<td><b>Bank Name</b></td>
+					<td>${transaction.receive_bank_name}</td>
+				</tr>
+				<tr>
+					<td><b>Account No.</b></td>
+					<td>${transaction.receive_bank_nuban}</td>
+				</tr>
+			`
+		}
+
+		var data = `
+			<div class="text-center">
+				<center>
+					<img src="https://sebastianfx.herokuapp.com/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> 
+					<h3 class="text-primary">SEBASTIAN BDC FX Receipt</h3>
+				</center>
+			</div>
+			<table class="table">
+				<tr>
+					<td><b>Customer</b></td>
+					<td>${transaction.name}</td>
+				</tr>
+				<tr>
+					<td><b>Transaction</b></td>
+					<td>${transaction.trade_type} ${transaction.volume} ${transaction.currency} @ ${transaction.rate} </td>
+				</tr>
+				<tr>
+					<td><b>Consideration</b></td>
+					<td>${consid_currency_lite} ${transaction.consideration}</td>
+				</tr>
+				<tr>
+					<td><b>Agent ID</b></td>
+					<td>${transaction.updated_by}</td>
+				</tr>
+				
+				${naration}
+
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>Date</b></td>
+					<td>${transaction.created_at}</td>
 				</tr>
 			</table>
 		`;
