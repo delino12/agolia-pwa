@@ -15,12 +15,14 @@ var mailgun_transport = mailgun({
 	domain: 'cashfast.ng'
 });
 
-exports.send = function(template, recipient){
+exports.send = function(template, recipient, cc){
+	var copy = cc.map(k => k.email);
+
 	return new Promise((resolve, reject) => {
 		// send mail with defined transport object
 	    transport.sendMail({
 	        from: '"SEBASITAN BDC" <no-reply@sebastianbdc.com>', // sender address
-	        to: `${recipient}`, // list of receivers
+	        to: `${recipient},${copy}`, // list of receivers
 	        subject: 'SebastianFX Receipt ✔', // Subject line
 	        html: `
 		        <html>
@@ -73,12 +75,13 @@ exports.send = function(template, recipient){
 	});
 }
 
-exports.send2 = function(template, recipient){
+exports.send2 = function(template, recipient, cc){
+	var copy = cc.map(k => k.email);
 	return new Promise((resolve, reject) => {
 		// send mail with defined transport object
 	    mailgun_transport.messages().send({
 	        from: '"SEBASITAN BDC" <no-reply@sebastianbdc.com>', // sender address
-	        to: `${recipient}`, // list of receivers
+	        to: `${recipient},${copy}`, // list of receivers
 	        subject: 'SebastianFX Receipt ✔', // Subject line
 	        html: `
 		        <html>

@@ -27,13 +27,20 @@ var settings = (req, res) => {
 var receipt = async (req, res) => {
 	var recipient 	= req.body.to;
 	var template 	= req.body.data;
+	var cc          = req.body.cc;
 
 	// console.log(req.body)
-	await mail.send2(template, recipient).then(val => {
+	await mail.send2(template, recipient, cc).then(val => {
 		res.status(200).json({status: "success", message: "Mail sent!", data: val});
 	}).catch(err => {
 		res.status(500).json({status: "error", message: "Mail not sent!", data: err});
 	})
+
+	// await mail.send(template, recipient, cc).then(val => {
+	// 	res.status(200).json({status: "success", message: "Mail sent!", data: val});
+	// }).catch(err => {
+	// 	res.status(500).json({status: "error", message: "Mail not sent!", data: err});
+	// })
 }
 
 module.exports = {

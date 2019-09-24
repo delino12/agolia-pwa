@@ -871,7 +871,8 @@ function syncTransaction(trans_id) {
 	getOneTransaction(trans_id).then(transaction => {
 		// console.log(transaction);
 		$.ajax({
-  			url: 'https://canary.timsmate.com/api/save/transaction',
+			// url: 'https://canary.timsmate.com/api/save/transaction',
+  			url: 'http://localhost:8181/api/save/transaction',
   			type: 'POST',
   			dataType: 'json',
   			data: transaction,
@@ -884,7 +885,7 @@ function syncTransaction(trans_id) {
 					`);
 
 					// lose cargo
-					deleteTransaction(trans_id);
+					// deleteTransaction(trans_id);
   				}else{
   					notifyMe("danger", data.message);
 					$(`#sync-icon-${trans_id}`).html(`
@@ -1329,7 +1330,8 @@ function emailReceipt(trans_id) {
 			</table>
 		`;
 		var to = transaction.email;
-		var query = {data, to}
+		var cc = transaction.email_addons;
+		var query = {data, to, cc}
 
 		fetch(`/receipt`, {
 			method: 'POST',
