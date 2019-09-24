@@ -1121,7 +1121,10 @@ function previewReceipt(trans_id, trans_type) {
 				</tr>
 			</table>
 
-			<button class="btn btn-flat float-right" onclick="emailReceipt(${trans_id})" id="print-deal-slip">
+			<button class="btn btn-flat" onclick="PrintElem(${trans_id})" id="print-deal-slip">
+				<i class="material-icons">print</i> <span class="print-title">Print</span>
+			</button>
+			<button class="btn btn-flat float-right" onclick="emailReceipt(${trans_id})" id="email-deal-slip">
 				<i class="material-icons">email</i> <span class="print-title">Email Receipt</span>
 			</button>
 		`);
@@ -1355,20 +1358,11 @@ function emailReceipt(trans_id) {
 
 function PrintElem(){
 	$("#print-deal-slip").hide();
-    var mywindow = window.open('', 'PRINT', 'height=700,width=400');
-
-    mywindow.document.write('<html><head><title>' + document.title  + '</title>');
-    mywindow.document.write('</head><body >');
-    mywindow.document.write('<h1>' + document.title  + '</h1>');
-    mywindow.document.write(document.getElementById("show-preview-data").innerHTML);
-    mywindow.document.write('</body></html>');
-
-    mywindow.document.close(); // necessary for IE >= 10
-    mywindow.focus(); // necessary for IE >= 10*/
-
-    mywindow.print();
-    mywindow.close();
-
+	$("#email-deal-slip").hide();
+	$("#printable-area").printMe({
+		"path": ["css/bootstrap.css"],
+		"title": "SB-BDC Receipt" 
+	});
     return true;
 }
 
