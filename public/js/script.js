@@ -1359,10 +1359,16 @@ function emailReceipt(trans_id) {
 function PrintElem(){
 	$("#print-deal-slip").hide();
 	$("#email-deal-slip").hide();
+	var printContents = document.getElementById("printable-area").innerHTML;
+    var originalContents = document.body.innerHTML;
+
+     // document.body.innerHTML = printContents;
 	$("#printable-area").printMe({
 		"path": ["css/bootstrap.css"],
-		"title": "SB-BDC Receipt" 
+		"title": "Receipt" 
 	});
+
+	// window.print();
     return true;
 }
 
