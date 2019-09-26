@@ -11,6 +11,7 @@ var filesToCache = [
     'js/bootstrap.min.js',
     'js/numeral.js',
     'js/printme.js',
+    'js/html2canvas.js',
     'js/script.js',
     'buy',
     'sell',

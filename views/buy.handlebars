@@ -126,24 +126,15 @@
                             </div>
                         </div>
                     </div>
+                    <br />
                     <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="pay_customer_bank_name">Bank Name</label>
-                                <select class="form-control" id="pay_customer_bank_name">
-                                    <option value="">Select Bank</option>
-                                </select>
-                            </div>
+                        <div class="col-sm-12">
+                            <a href="javascript:void(0);" onclick="addMoreBankField()" class="">
+                                <i class="material-icons">add</i> <span class="buy-title">Add Bank</span>
+                            </a>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="customer_currency">Account Number</label>
-                                <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="customer_bank_nuban">
-                            </div>
-                        </div>
-                    </div>
+                    <div id="banks-addon"></div>
                 </div>
             </div>
         </div>
@@ -211,6 +202,12 @@
                     <div class="form-group">
                         <label for="agent_comments">Comment (Optional)</label>
                         <textarea class="form-control" placeholder="Write a comment..." id="agent_comment"></textarea>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="transport_charges">Transport Charges (Optional)</label>
+                        <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="transport_charges">
                     </div>
                 </div>
                 <div class="col-sm-12">

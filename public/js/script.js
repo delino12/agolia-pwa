@@ -276,20 +276,12 @@ function getAvailableBanks() {
 		return r.json();
 	}).then(results => {
 		// console.log(results)
-		$("#pay_customer_bank_name").html("");
+		// $("#pay_customer_bank_name").html("");
 		$("#receive_bank_name").html("");
-		$("#pay_customer_bank_name").append(`
-			<option value=""> -- select bank -- </option>
-		`)
 		$("#receive_bank_name").append(`
 			<option value=""> -- select bank -- </option>
 		`)
 		$.each(results.data, function(index, bank) {
-			 /* iterate through array or object */
-			$("#pay_customer_bank_name").append(`
-				<option value="${bank.code}">${bank.name}</option>
-			`)
-
 			$("#receive_bank_name").append(`
 				<option value="${bank.code}">${bank.name}</option>
 			`);
@@ -297,80 +289,6 @@ function getAvailableBanks() {
 	}).catch(err => {
 		console.log(JSON.stringify(err));
 	})
-}
-
-function saveToQueue() {
-	var consideration       = $("#customer_consideration").val();
-	var name 				= $("#customer_name").val();
-	var email 				= $("#customer_email").val();
-	var phone 				= $("#customer_phone").val();
-	var currency 			= $("#customer_currency").val();
-	var volume 				= $("#customer_volume").val();
-	var rate 				= $("#customer_rate").val();
-	var pay_cash 			= $("#pay_customer_cash").val();
-	var pay_wire 			= $("#pay_customer_wire").val();
-	var pay_bank_name 		= $("#pay_customer_bank_name").val();
-	var pay_bank_nuban 		= $("#customer_bank_nuban").val();
-	var receive_cash 		= $("#receive_customer_cash").val();
-	var receive_wire 		= $("#receive_customer_wire").val();
-	var receive_bank_name 	= $("#receive_bank_name").val();
-	var receive_bank_nuban 	= $("#receive_bank_nuban").val();
-	var trade_type          = $("#trade_type").val();
-	var created_at          = current_date;
-	var updated_at          = current_date;
-	var updated_by          = $("#agent_id").val();
-	var created_by          = $("#agent_id").val();
-	var comment  			= $("#agent_comment").val();
-	var documents       	= files_box;
-	var email_addons        = email_fields_box;
-
-	// trim numeric value
-	consideration = consideration.replace(/,/g, "");
-    volume 		= volume.replace(/,/g, "");
-    rate 		= rate.replace(/,/g, "");
-    pay_cash 	= pay_cash.replace(/,/g, "");
-    pay_wire 	= pay_wire.replace(/,/g, "");
-    receive_wire = receive_wire.replace(/,/g, "");
-    receive_cash = receive_cash.replace(/,/g, "");
-
-    if(trade_type == "1"){
-    	if((parseFloat(pay_cash) + parseFloat(pay_wire)) !== parseFloat(consideration)){
-			notifyMe("warning", "Check customer cash and wire field must equal consideration!");
-			// return 
-			return false;
-		}
-
-		if((parseFloat(receive_cash) + parseFloat(receive_wire)) !== parseFloat(volume)){
-			notifyMe("warning", " Check BDC cash and wire field must equal volume!");
-			// return 
-			return false;
-		}
-    }else if(trade_type == "2"){
-    	if((parseFloat(pay_cash) + parseFloat(pay_wire)) !== parseFloat(volume)){
-    		console.log(parseFloat(pay_cash) + parseFloat(pay_wire))
-    		console.log(parseFloat(volume))
-			notifyMe("warning", "Check BDC pay cash and wire field must equal volume!");
-			// return 
-			return false;
-		}
-
-		if((parseFloat(receive_cash) + parseFloat(receive_wire)) !== parseFloat(consideration)){
-			console.log(parseFloat(receive_cash) + parseFloat(receive_wire))
-    		console.log(parseFloat(consideration))
-			notifyMe("warning", " Check customer receive cash and wire field must equal consideration!");
-			// return 
-			return false;
-		}
-    }
-
-	var query = {name, email, phone, currency, volume, rate, pay_cash, pay_wire, pay_bank_name, pay_bank_nuban, receive_cash, receive_wire, receive_bank_name, receive_bank_nuban, consideration, trade_type, created_at, updated_at, created_by, updated_by, documents, email_addons, comment}
-	// console.log(query);
-
-	// save to offline db
-	saveToTransaction(query);
-
-	// return 
-	return false;
 }
 
 function notifyMe(status, message) {
@@ -514,13 +432,156 @@ function addMoreEmailField() {
 	}
 }
 
-// push to image binary
+// push to bank binary
 function pushExtraEmail(element) {
 	var email = element.value;
 	email_fields_box.push({
 		email: email
 	});
 }
+
+var totalBankFieldLimit = 3;
+var totalBankFieldFileCount = 0;
+var bank_fields_box = [];
+function addMoreBankField() {
+	if(totalBankFieldFileCount > totalBankFieldLimit){
+		notifyMe("info", `You have exceeded the banks add-on limit, You can only add maximun of ${totalBankFieldLimit} bank fields.`);
+		// return
+		return false
+	}else{
+		$("#banks-addon").append(`
+			<div class="row">
+				<div class="col-sm-6" style="width: 50%;">
+	                <div class="form-group">
+	                    <label for="pay_customer_bank_name_${totalBankFieldFileCount}">Bank Name</label>
+	                    <select class="form-control" id="pay_customer_bank_name_${totalBankFieldFileCount}">
+	                        <option value="">Select Bank</option>
+	                    </select>
+	                </div>
+	            </div>
+	            <div class="col-sm-6" style="width: 50%;">
+	                <div class="form-group">
+	                    <label for="customer_bank_nuban_${totalBankFieldFileCount}">Account Number</label>
+	                    <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="customer_bank_nuban_${totalBankFieldFileCount}">
+	                </div>
+	            </div>
+	            <div class="col-sm-12">
+	                <div class="form-group">
+	                    <label for="amount_${totalBankFieldFileCount}">Amount</label>
+	                    <input type="text" pattern="[0-9.,]+" value="0.00" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="amount_${totalBankFieldFileCount}">
+	                </div>
+	            </div>
+            </div>
+            <hr />
+		`);
+		preloadBankCodes(totalBankFieldFileCount);
+		totalBankFieldFileCount++;
+	}
+}
+
+function preloadBankCodes(sn) {
+	fetch(`/banks.json`).then(r => {
+		return r.json();
+	}).then(results => {
+		// console.log(results)
+		$(`#pay_customer_bank_name_${sn}`).html("");
+		$(`#pay_customer_bank_name_${sn}`).append(`
+			<option value=""> -- select bank -- </option>
+		`)
+		$.each(results.data, function(index, bank) {
+			$(`#pay_customer_bank_name_${sn}`).append(`
+				<option value="${bank.code}">${bank.name}</option>
+			`);
+		});
+	}).catch(err => {
+		console.log(JSON.stringify(err));
+	})
+}
+
+function saveToQueue() {
+	var consideration       = $("#customer_consideration").val();
+	var name 				= $("#customer_name").val();
+	var email 				= $("#customer_email").val();
+	var phone 				= $("#customer_phone").val();
+	var currency 			= $("#customer_currency").val();
+	var volume 				= $("#customer_volume").val();
+	var rate 				= $("#customer_rate").val();
+	var pay_cash 			= $("#pay_customer_cash").val();
+	var pay_wire 			= $("#pay_customer_wire").val();
+	var pay_bank_name 		= $("#pay_customer_bank_name").val();
+	var pay_bank_nuban 		= $("#customer_bank_nuban").val();
+	var receive_cash 		= $("#receive_customer_cash").val();
+	var receive_wire 		= $("#receive_customer_wire").val();
+	var receive_bank_name 	= $("#receive_bank_name").val();
+	var receive_bank_nuban 	= $("#receive_bank_nuban").val();
+	var trade_type          = $("#trade_type").val();
+	var created_at          = current_date;
+	var updated_at          = current_date;
+	var updated_by          = $("#agent_id").val();
+	var created_by          = $("#agent_id").val();
+	var comment  			= $("#agent_comment").val();
+	var documents       	= files_box;
+	var email_addons        = email_fields_box;
+	var transport_charges   = $("#transport_charges").val();
+
+	var bank_addons = [];
+	for(var i = 0; i < totalBankFieldFileCount; i++){
+		bank_addons.push({
+			bank_name: $(`#pay_customer_bank_name_${i}`).val(),
+			bank_no: $(`#customer_bank_nuban_${i}`).val(),
+			amount: $(`#amount_${i}`).val()
+		})
+	}
+
+	// trim numeric value
+	consideration = consideration.replace(/,/g, "");
+    volume 		= volume.replace(/,/g, "");
+    rate 		= rate.replace(/,/g, "");
+    pay_cash 	= pay_cash.replace(/,/g, "");
+    pay_wire 	= pay_wire.replace(/,/g, "");
+    receive_wire = receive_wire.replace(/,/g, "");
+    receive_cash = receive_cash.replace(/,/g, "");
+
+    if(trade_type == "1"){
+    	if((parseFloat(pay_cash) + parseFloat(pay_wire)) !== parseFloat(consideration)){
+			notifyMe("warning", "Check customer cash and wire field must equal consideration!");
+			// return 
+			return false;
+		}
+
+		if((parseFloat(receive_cash) + parseFloat(receive_wire)) !== parseFloat(volume)){
+			notifyMe("warning", " Check BDC cash and wire field must equal volume!");
+			// return 
+			return false;
+		}
+    }else if(trade_type == "2"){
+    	if((parseFloat(pay_cash) + parseFloat(pay_wire)) !== parseFloat(volume)){
+    		console.log(parseFloat(pay_cash) + parseFloat(pay_wire))
+    		console.log(parseFloat(volume))
+			notifyMe("warning", "Check BDC pay cash and wire field must equal volume!");
+			// return 
+			return false;
+		}
+
+		if((parseFloat(receive_cash) + parseFloat(receive_wire)) !== parseFloat(consideration)){
+			console.log(parseFloat(receive_cash) + parseFloat(receive_wire))
+    		console.log(parseFloat(consideration))
+			notifyMe("warning", " Check customer receive cash and wire field must equal consideration!");
+			// return 
+			return false;
+		}
+    }
+
+	var query = {name, email, phone, currency, volume, rate, pay_cash, pay_wire, pay_bank_name, pay_bank_nuban, receive_cash, receive_wire, receive_bank_name, receive_bank_nuban, consideration, trade_type, created_at, updated_at, created_by, updated_by, documents, email_addons, transport_charges, bank_addons, comment}
+	// console.log(query);
+
+	// save to offline db
+	saveToTransaction(query);
+
+	// return 
+	return false;
+}
+
 
 // get banks
 getAvailableBanks();
@@ -871,8 +932,8 @@ function syncTransaction(trans_id) {
 	getOneTransaction(trans_id).then(transaction => {
 		// console.log(transaction);
 		$.ajax({
-			url: 'https://canary.timsmate.com/api/save/transaction',
-  			// url: 'http://localhost:8181/api/save/transaction',
+			// url: 'https://canary.timsmate.com/api/save/transaction',
+  			url: 'http://localhost:8181/api/save/transaction',
   			type: 'POST',
   			dataType: 'json',
   			data: transaction,
@@ -1359,16 +1420,18 @@ function emailReceipt(trans_id) {
 function PrintElem(){
 	$("#print-deal-slip").hide();
 	$("#email-deal-slip").hide();
-	var printContents = document.getElementById("printable-area").innerHTML;
-    var originalContents = document.body.innerHTML;
 
-     // document.body.innerHTML = printContents;
-	$("#printable-area").printMe({
-		"path": ["css/bootstrap.css"],
-		"title": "Receipt" 
+	html2canvas(document.querySelector("#printable-area")).then(canvas => {
+	    document.body.appendChild(canvas)
 	});
 
-	// window.print();
+    // document.body.innerHTML = printContents;
+	// $("#printable-area").printMe({
+	// 	"path": ["css/bootstrap.css"],
+	// 	"title": "Receipt" 
+	// });
+
+	window.print();
     return true;
 }
 
