@@ -126,24 +126,15 @@
                             </div>
                         </div>
                     </div>
+                    <br />
                     <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="pay_customer_bank_name">Bank Name</label>
-                                <select class="form-control" id="pay_customer_bank_name">
-                                    <option value="">Select Bank</option>
-                                </select>
-                            </div>
+                        <div class="col-sm-12">
+                            <a href="javascript:void(0);" onclick="addMoreBankField()" class="">
+                                <i class="material-icons">add</i> <span class="buy-title">Add Customer Bank</span>
+                            </a>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="customer_currency">Account Number</label>
-                                <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="customer_bank_nuban">
-                            </div>
-                        </div>
-                    </div>
+                    <div id="banks-addon"></div>
                 </div>
             </div>
         </div>
@@ -170,14 +161,15 @@
                             </div>
                         </div>
                     </div>
+                    <br />
                     <div class="row">
                         <div class="col-sm-12">
-                            <a href="javascript:void(0);" onclick="addMoreBankField()" class="">
-                                <i class="material-icons">add</i> <span class="buy-title">Add Bank</span>
+                            <a href="javascript:void(0);" onclick="addBDCMoreBankField()" class="">
+                                <i class="material-icons">add</i> <span class="buy-title">Add BDC Bank</span>
                             </a>
                         </div>
                     </div>
-                    <div id="banks-addon"></div>
+                    <div id="receive-banks-addon"></div>
                 </div>
             </div>
         </div>

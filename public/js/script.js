@@ -451,7 +451,7 @@ function addMoreBankField() {
 	}else{
 		$("#banks-addon").append(`
 			<div class="row">
-				<div class="col-sm-6" style="width: 50%;">
+				<div class="col-sm-4" style="width: 50%;">
 	                <div class="form-group">
 	                    <label for="pay_customer_bank_name_${totalBankFieldFileCount}">Bank Name</label>
 	                    <select class="form-control" id="pay_customer_bank_name_${totalBankFieldFileCount}">
@@ -459,13 +459,13 @@ function addMoreBankField() {
 	                    </select>
 	                </div>
 	            </div>
-	            <div class="col-sm-6" style="width: 50%;">
+	            <div class="col-sm-4" style="width: 50%;">
 	                <div class="form-group">
 	                    <label for="customer_bank_nuban_${totalBankFieldFileCount}">Account Number</label>
 	                    <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="customer_bank_nuban_${totalBankFieldFileCount}">
 	                </div>
 	            </div>
-	            <div class="col-sm-12">
+	            <div class="col-sm-4" style="width: 50%;">
 	                <div class="form-group">
 	                    <label for="amount_${totalBankFieldFileCount}">Amount</label>
 	                    <input type="text" pattern="[0-9.,]+" value="0.00" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="amount_${totalBankFieldFileCount}">
@@ -474,25 +474,78 @@ function addMoreBankField() {
             </div>
             <hr />
 		`);
-		preloadBankCodes(totalBankFieldFileCount);
+		preloadBankCodes(totalBankFieldFileCount, 1); // 1 means customer banks
 		totalBankFieldFileCount++;
 	}
 }
 
-function preloadBankCodes(sn) {
+var totalReceiveBankFieldLimit = 3;
+var totalReceiveBankFieldFileCount = 0;
+var bank_fields_box = [];
+function addBDCMoreBankField() {
+	if(totalReceiveBankFieldFileCount > totalReceiveBankFieldLimit){
+		notifyMe("info", `You have exceeded the banks add-on limit, You can only add maximun of ${totalReceiveBankFieldLimit} bank fields.`);
+		// return
+		return false
+	}else{
+		$("#receive-banks-addon").append(`
+			<div class="row">
+				<div class="col-sm-4" style="width: 50%;">
+	                <div class="form-group">
+	                    <label for="receive_bank_name_${totalReceiveBankFieldFileCount}">Bank Name</label>
+	                    <select class="form-control" id="receive_bank_name_${totalReceiveBankFieldFileCount}">
+	                        <option value="">Select Bank</option>
+	                    </select>
+	                </div>
+	            </div>
+	            <div class="col-sm-4" style="width: 50%;">
+	                <div class="form-group">
+	                    <label for="receive_bank_nuban_${totalReceiveBankFieldFileCount}">Account Number</label>
+	                    <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="receive_bank_nuban_${totalReceiveBankFieldFileCount}">
+	                </div>
+	            </div>
+	            <div class="col-sm-4" style="width: 50%;">
+	                <div class="form-group">
+	                    <label for="receive_amount_${totalReceiveBankFieldFileCount}">Amount</label>
+	                    <input type="text" pattern="[0-9.,]+" value="0.00" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="receive_amount_${totalReceiveBankFieldFileCount}">
+	                </div>
+	            </div>
+            </div>
+            <hr />
+		`);
+		preloadBankCodes(totalReceiveBankFieldFileCount, 2); // 2 means bdc banks
+		totalReceiveBankFieldFileCount++;
+	}
+}
+
+function preloadBankCodes(sn, type) {
 	fetch(`/banks.json`).then(r => {
 		return r.json();
 	}).then(results => {
-		// console.log(results)
-		$(`#pay_customer_bank_name_${sn}`).html("");
-		$(`#pay_customer_bank_name_${sn}`).append(`
-			<option value=""> -- select bank -- </option>
-		`)
-		$.each(results.data, function(index, bank) {
+
+		if(type == 1){
+			// console.log(results)
+			$(`#pay_customer_bank_name_${sn}`).html("");
 			$(`#pay_customer_bank_name_${sn}`).append(`
-				<option value="${bank.code}">${bank.name}</option>
-			`);
-		});
+				<option value=""> -- select bank -- </option>
+			`)
+			$.each(results.data, function(index, bank) {
+				$(`#pay_customer_bank_name_${sn}`).append(`
+					<option value="${bank.code}">${bank.name}</option>
+				`);
+			});
+		}else if(type == 2){
+			// console.log(results)
+			$(`#receive_bank_name_${sn}`).html("");
+			$(`#receive_bank_name_${sn}`).append(`
+				<option value=""> -- select bank -- </option>
+			`)
+			$.each(results.data, function(index, bank) {
+				$(`#receive_bank_name_${sn}`).append(`
+					<option value="${bank.code}">${bank.name}</option>
+				`);
+			});
+		}
 	}).catch(err => {
 		console.log(JSON.stringify(err));
 	})
@@ -530,6 +583,15 @@ function saveToQueue() {
 			bank_name: $(`#pay_customer_bank_name_${i}`).val(),
 			bank_no: $(`#customer_bank_nuban_${i}`).val(),
 			amount: $(`#amount_${i}`).val()
+		})
+	}
+
+	var bdc_bank_addons = [];
+	for(var i = 0; i < totalReceiveBankFieldFileCount; i++){
+		bdc_bank_addons.push({
+			bank_name: $(`#receive_bank_name_${i}`).val(),
+			bank_no: $(`#customer_bank_nuban_${i}`).val(),
+			amount: $(`#receive_amount_${i}`).val()
 		})
 	}
 
@@ -572,7 +634,7 @@ function saveToQueue() {
 		}
     }
 
-	var query = {name, email, phone, currency, volume, rate, pay_cash, pay_wire, pay_bank_name, pay_bank_nuban, receive_cash, receive_wire, receive_bank_name, receive_bank_nuban, consideration, trade_type, created_at, updated_at, created_by, updated_by, documents, email_addons, transport_charges, bank_addons, comment}
+	var query = {name, email, phone, currency, volume, rate, pay_cash, pay_wire, pay_bank_name, pay_bank_nuban, receive_cash, receive_wire, receive_bank_name, receive_bank_nuban, consideration, trade_type, created_at, updated_at, created_by, updated_by, documents, email_addons, transport_charges, bank_addons, bdc_bank_addons, comment}
 	// console.log(query);
 
 	// save to offline db
