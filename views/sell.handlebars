@@ -108,7 +108,7 @@
                 <div class="card-feel card-box">
                     <div class="row">
                         <div class="col-sm-12">
-                            <h5>SB-BDC Collect <-- <span id="preview-pay-currency"></span></h5>
+                            <h5>Pay --> <span id="preview-customer-name">[Customer]</span> <span id="preview-pay-currency"></span></h5>
                         </div>
                     </div>
                     <hr />
@@ -152,7 +152,7 @@
                 <div class="card-feel card-box">
                     <div class="row">
                         <div class="col-sm-12">
-                            <h5>Pay --> <span id="preview-customer-name">[Customer]</span> <span id="preview-receive-currency"></span> </h5>
+                            <h5>SB-BDC Collect <-- <span id="preview-receive-currency"></span> </h5>
                         </div>
                     </div>
                     <hr />
@@ -181,7 +181,6 @@
                 </div>
             </div>
         </div>
-
         <div class="card-feel card-box" style="min-height: 100px;">
             <div class="row">
                 <div class="col-sm-12">
@@ -202,6 +201,12 @@
                     <div class="form-group">
                         <label for="agent_comments">Comment (Optional)</label>
                         <textarea class="form-control" placeholder="Write a comment..." id="agent_comment"></textarea>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="transport_charges">Transport Charges (Optional)</label>
+                        <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="transport_charges">
                     </div>
                 </div>
                 <div class="col-sm-12">
