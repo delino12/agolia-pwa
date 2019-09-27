@@ -994,8 +994,8 @@ function syncTransaction(trans_id) {
 	getOneTransaction(trans_id).then(transaction => {
 		// console.log(transaction);
 		$.ajax({
-			// url: 'https://canary.timsmate.com/api/save/transaction',
-  			url: 'http://localhost:8181/api/save/transaction',
+			url: 'https://canary.timsmate.com/api/save/transaction',
+  			// url: 'http://localhost:8181/api/save/transaction',
   			type: 'POST',
   			dataType: 'json',
   			data: transaction,
@@ -1146,14 +1146,6 @@ function previewReceipt(trans_id, trans_type) {
 					<td><b>Wire</b></td>
 					<td>${transaction.receive_wire}</td>
 				</tr>
-				<tr>
-					<td><b>Bank Name</b></td>
-					<td>${transaction.receive_bank_name}</td>
-				</tr>
-				<tr>
-					<td><b>Account No.</b></td>
-					<td>${transaction.receive_bank_nuban}</td>
-				</tr>
 			`
 		}else if(transaction.trade_type == "Purchased"){
 			naration = `
@@ -1197,14 +1189,6 @@ function previewReceipt(trans_id, trans_type) {
 				<tr>
 					<td><b>Wire</b></td>
 					<td>${transaction.receive_wire}</td>
-				</tr>
-				<tr>
-					<td><b>Bank Name</b></td>
-					<td>${transaction.receive_bank_name}</td>
-				</tr>
-				<tr>
-					<td><b>Account No.</b></td>
-					<td>${transaction.receive_bank_nuban}</td>
 				</tr>
 			`
 		}
@@ -1355,14 +1339,6 @@ function emailReceipt(trans_id) {
 					<td><b>Wire</b></td>
 					<td>${transaction.receive_wire}</td>
 				</tr>
-				<tr>
-					<td><b>Bank Name</b></td>
-					<td>${transaction.receive_bank_name}</td>
-				</tr>
-				<tr>
-					<td><b>Account No.</b></td>
-					<td>${transaction.receive_bank_nuban}</td>
-				</tr>
 			`
 		}else if(transaction.trade_type == "Purchased"){
 			naration = `
@@ -1406,14 +1382,6 @@ function emailReceipt(trans_id) {
 				<tr>
 					<td><b>Wire</b></td>
 					<td>${transaction.receive_wire}</td>
-				</tr>
-				<tr>
-					<td><b>Bank Name</b></td>
-					<td>${transaction.receive_bank_name}</td>
-				</tr>
-				<tr>
-					<td><b>Account No.</b></td>
-					<td>${transaction.receive_bank_nuban}</td>
 				</tr>
 			`
 		}
@@ -1487,13 +1455,10 @@ function PrintElem(){
 	    document.body.appendChild(canvas)
 	});
 
-    // document.body.innerHTML = printContents;
-	// $("#printable-area").printMe({
-	// 	"path": ["css/bootstrap.css"],
-	// 	"title": "Receipt" 
-	// });
-
-	window.print();
+	$("#printable-area").printMe({
+		"path": ["css/bootstrap.css"],
+		"title": "Receipt" 
+	});
     return true;
 }
 
