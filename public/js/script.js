@@ -1,3 +1,6 @@
+const endpoint = 'http://localhost:8181';
+// const endpoint = 'https://canary.timsmate.com';
+
 window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
 		// register the service worker
@@ -125,35 +128,6 @@ function initLogin() {
 
     // void form
     return false;
-}
-
-// login agent
-function attempLogin(username, passcode) {
-	return new Promise((resolve, reject) => {
-		// body
-	    fetch(`/users.json`).then(r => {
-	    	return r.json();
-	    }).then(results => {
-	    	// console.log(results);
-	    	var users = results.data;
-	    	let isMatch = false;
-
-	    	for(var i =0; i < users.length; i++) {
-		        if(username == users[i].agent_id && passcode == users[i].password){
-		            sessionStorage.setItem("username", username);
-		            isMatch = true;
-		        }
-		    } 
-
-		    if(isMatch == true){
-		    	resolve(true);
-		    }else{
-		    	resolve(false)
-		    }
-	    }).catch(err => {
-	    	console.log(err);
-	    })  
-	})
 }
 
 function previewCustomerName() {
@@ -664,7 +638,7 @@ if (!window.indexedDB) {
 function openDatabase() {
 	// return db instances
 	const DB_NAME 	= 'sebastianfx_db';
-	const database 	= indexedDB.open(DB_NAME, 1);
+	const database 	= indexedDB.open(DB_NAME, 2);
 
 	// on error catch errors 
 	database.onerror = (event) => {
@@ -689,6 +663,12 @@ function openDatabase() {
 					keyPath: "id",
 					autoIncrement : true
 				});
+			case 2:
+				// Create an objectStore for this database
+				upgradeDB.createObjectStore("users", {
+					keyPath: "id",
+					autoIncrement : true
+			  	});
 			default:
 				console.log("no database object created!");
 		}
@@ -696,6 +676,125 @@ function openDatabase() {
 
 	// return db instance
 	return database;
+}
+
+// count total local users data
+function countLocalUserData() {
+	// init database
+	const db = openDatabase();
+	return new Promise((resolve, reject) => {
+		// on success fetch data
+		db.onsuccess = function(event) {
+			// Do something with request.result!
+			var query = event.target.result;
+		  	var users = query.transaction("users").objectStore("users").count();
+
+		  	users.onsuccess = function(event){
+		  		// show total
+		  		// console.log(event);
+		  		resolve(event.target.result)
+		  	}
+
+		  	users.onerror = function(event){
+		  		reject(event.target.result);
+		  	}
+		}
+	})
+}
+
+// fetch users from cloud
+fetchUsersFromCloud();
+
+// fetch users from cloud
+async function fetchUsersFromCloud() {
+	// body...
+	var total_user = await resolveTotalServerUsers().then(total => total);
+	var total_offline_user = await countLocalUserData().then(total => total);
+	if(total_user > total_offline_user){
+		var users = await resolveAllServerUsers().then(users => users);
+		// console.log(users);
+		users.forEach(function(user) {
+			saveToUsers(user);
+		})
+	}
+}
+
+// resolve total users
+function resolveTotalServerUsers() {
+	return new Promise((resolve, reject) => {
+		fetch(`${endpoint}/api/count/agents`).then(r => {
+			return r.json();
+		}).then(results => {
+			console.log(results)
+			resolve(results)
+		}).catch(err => {
+			console.log(err)
+			reject(err)
+		})
+	})
+}
+
+// resolve all users
+function resolveAllServerUsers() {
+	return new Promise((resolve, reject) => {
+		fetch(`${endpoint}/api/all/agents`).then(r => {
+			return r.json();
+		}).then(results => {
+			console.log(results)
+			resolve(results)
+		}).catch(err => {
+			console.log(err)
+			reject(err)
+		})
+	})
+}
+
+// save to users
+function saveToUsers(payload) {
+	// body
+	const db = openDatabase();
+
+	// on success add user
+	db.onsuccess = (event) => {
+		const query = event.target.result;
+		const users = query.transaction("users", "readwrite").objectStore("users");
+		users.add(payload);
+
+		console.log('login table updated');
+
+		// return 
+		return true;
+	}
+}
+
+// login agent
+function attempLogin(username, passcode) {
+	const db = openDatabase();
+	return new Promise((resolve, reject) => {
+		// on success add user
+		db.onsuccess = (event) => {
+			const query = event.target.result;
+			const users = query.transaction("users", "readwrite").objectStore("users").getAll();
+
+			users.onsuccess = function(event){
+				var all_users = event.target.result;
+				console.log(all_users);
+		    	let isMatch = false;
+		    	for(var i =0; i < all_users.length; i++) {
+			        if(username == all_users[i].agent_code && passcode == all_users[i].agent_pass){
+			            sessionStorage.setItem("username", username);
+			            isMatch = true;
+			        }
+			    } 
+
+			    if(isMatch == true){
+			    	resolve(true);
+			    }else{
+			    	resolve(false)
+			    }
+			}
+		}
+	})
 }
 
 // save transaction
@@ -994,8 +1093,7 @@ function syncTransaction(trans_id) {
 	getOneTransaction(trans_id).then(transaction => {
 		// console.log(transaction);
 		$.ajax({
-			url: 'https://canary.timsmate.com/api/save/transaction',
-  			// url: 'http://localhost:8181/api/save/transaction',
+  			url: `${endpoint}/api/save/transaction`,
   			type: 'POST',
   			dataType: 'json',
   			data: transaction,
