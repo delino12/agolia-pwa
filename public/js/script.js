@@ -1,5 +1,5 @@
-// const endpoint = 'http://localhost:8181';
-const endpoint = 'https://canary.timsmate.com';
+const endpoint = 'http://localhost:8181';
+// const endpoint = 'https://canary.timsmate.com';
 
 window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
@@ -392,18 +392,30 @@ var totalEmailFieldLimit = 3;
 var totalEmailFieldFileCount = 0;
 var email_fields_box = [];
 function addMoreEmailField() {
-	totalEmailFieldFileCount++;
-
 	if(totalEmailFieldFileCount > totalEmailFieldLimit){
 		notifyMe("info", `You have exceeded the email add-on limit, You can only add maximun of ${totalEmailFieldLimit} emails.`);
 		// return
 		return false
 	}else{
+		totalEmailFieldFileCount++;
 		$("#email-addon").append(`
-			<br />
-			<input type="email" class="form-control input-classic" placeholder="someone@domain.com" onblur="pushExtraEmail(this)" required="">
+			<div id="email_wrapper_${totalEmailFieldFileCount}">
+				<br />
+				<a href="javascript:void(0);" onclick="removeEmail(${totalEmailFieldFileCount})" class="float-right">
+					<i class="material-icons">clear</i>
+				</a>
+				<input type="email" class="form-control input-classic" id="email_${totalEmailFieldFileCount}" placeholder="someone@domain.com" onblur="pushExtraEmail(this)" required="">
+			</div>
 		`);
+
 	}
+}
+
+function removeEmail(total_email) {
+	totalEmailFieldFileCount = (totalEmailFieldFileCount - 1);
+	$(`#email_wrapper_${total_email}`).remove();
+	
+	console.log(totalEmailFieldFileCount);
 }
 
 // push to bank binary
@@ -424,10 +436,14 @@ function addMoreBankField() {
 		return false
 	}else{
 		$("#banks-addon").append(`
-			<div class="row">
+			<div class="row" id="banks_addon_${totalBankFieldFileCount}">
 				<div class="col-sm-4" style="width: 50%;">
 	                <div class="form-group">
-	                    <label for="pay_customer_bank_name_${totalBankFieldFileCount}">Bank Name</label>
+	                    <label for="pay_customer_bank_name_${totalBankFieldFileCount}"> Bank Name
+			                <a href="javascript:void(0);" onclick="removeCustomerBank(${totalBankFieldFileCount})" class="float-right">
+								<i class="material-icons">clear</i>
+							</a>
+						</label>
 	                    <select class="form-control" id="pay_customer_bank_name_${totalBankFieldFileCount}">
 	                        <option value="">Select Bank</option>
 	                    </select>
@@ -446,11 +462,17 @@ function addMoreBankField() {
 	                </div>
 	            </div>
             </div>
-            <hr />
 		`);
 		preloadBankCodes(totalBankFieldFileCount, 1); // 1 means customer banks
 		totalBankFieldFileCount++;
 	}
+}
+
+function removeCustomerBank(addon_bank_id) {
+	// body...
+	totalBankFieldFileCount = (totalBankFieldFileCount - 1);
+	$(`#banks_addon_${addon_bank_id}`).remove();
+	console.log(totalBankFieldFileCount);
 }
 
 var totalReceiveBankFieldLimit = 3;
@@ -463,10 +485,14 @@ function addBDCMoreBankField() {
 		return false
 	}else{
 		$("#receive-banks-addon").append(`
-			<div class="row">
+			<div class="row" id="bdc_banks_addon_${totalReceiveBankFieldFileCount}">
 				<div class="col-sm-4" style="width: 50%;">
 	                <div class="form-group">
-	                    <label for="receive_bank_name_${totalReceiveBankFieldFileCount}">Bank Name</label>
+	                    <label for="receive_bank_name_${totalReceiveBankFieldFileCount}">Bank Name
+	                    	<a href="javascript:void(0);" onclick="removeBDCBank(${totalReceiveBankFieldFileCount})" class="float-right">
+								<i class="material-icons">clear</i>
+							</a>
+	                    </label>
 	                    <select class="form-control" id="receive_bank_name_${totalReceiveBankFieldFileCount}">
 	                        <option value="">Select Bank</option>
 	                    </select>
@@ -485,11 +511,17 @@ function addBDCMoreBankField() {
 	                </div>
 	            </div>
             </div>
-            <hr />
 		`);
 		preloadBankCodes(totalReceiveBankFieldFileCount, 2); // 2 means bdc banks
 		totalReceiveBankFieldFileCount++;
 	}
+}
+
+function removeBDCBank(addon_bank_id) {
+	// body...
+	totalReceiveBankFieldFileCount = (totalReceiveBankFieldFileCount - 1);
+	$(`#bdc_banks_addon_${addon_bank_id}`).remove();
+	console.log(totalReceiveBankFieldFileCount);
 }
 
 function preloadBankCodes(sn, type) {
