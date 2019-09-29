@@ -1,5 +1,5 @@
-const endpoint = 'http://localhost:8181';
-// const endpoint = 'https://canary.timsmate.com';
+// const endpoint = 'http://localhost:8181';
+const endpoint = 'https://canary.timsmate.com';
 
 window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
@@ -666,6 +666,10 @@ function saveToQueue() {
 	// save to offline db
 	saveToTransaction(query);
 
+	setTimeout(function(){
+		window.location.reload();
+	}, 1500)
+
 	// return 
 	return false;
 }
@@ -810,8 +814,6 @@ function saveToUsers(payload) {
 		const query = event.target.result;
 		const users = query.transaction("users", "readwrite").objectStore("users");
 		users.add(payload);
-
-		console.log('login table updated');
 
 		// return 
 		return true;
@@ -1095,14 +1097,6 @@ function viewTransaction(trans_id) {
 					<td>${transaction.pay_wire}</td>
 				</tr>
 				<tr>
-					<td><b>Bank Name</b></td>
-					<td>${transaction.pay_bank_name}</td>
-				</tr>
-				<tr>
-					<td><b>Account No</b></td>
-					<td>${transaction.pay_bank_nuban}</td>
-				</tr>
-				<tr>
 					<td><br /><br /></td>
 					<td>------------</td>
 				</tr>
@@ -1117,14 +1111,6 @@ function viewTransaction(trans_id) {
 				<tr>
 					<td><b>Wire</b></td>
 					<td>${transaction.receive_wire}</td>
-				</tr>
-				<tr>
-					<td><b>Bank Name</b></td>
-					<td>${transaction.receive_bank_name}</td>
-				</tr>
-				<tr>
-					<td><b>Account No</b></td>
-					<td>${transaction.receive_bank_nuban}</td>
 				</tr>
 			</table>
 			<button class="btn btn-flat float-right">
