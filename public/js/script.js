@@ -210,21 +210,28 @@ function calculateEquivalent() {
 }
 
 function togglePayWire() {
-	// var customer_consideration = $("#customer_consideration").val();
-	// var pay_cash = $("#pay_customer_cash").val();
-	// var pay_wire = $("#pay_customer_wire").val();
+	var customer_consideration = $("#customer_consideration").val();
+	var pay_cash = $("#pay_customer_cash").val();
+	var pay_wire = $("#pay_customer_wire").val();
 
-	// pay_cash = pay_cash.replace(/,/g, "");
- //    pay_wire = pay_wire.replace(/,/g, "");
+	pay_cash = pay_cash.replace(/,/g, "");
+	// pay_cash = pay_cash.replace(/./g, "");
+    pay_wire = pay_wire.replace(/,/g, "");
+    // pay_wire = pay_wire.replace(/./g, "");
+    pay_cash = parseInt(pay_cash);
+    pay_wire = parseInt(pay_wire);
 
- //    if(parseFloat(pay_cash) < 0){
- //    	$("#pay_customer_wire").val(numeral(customer_consideration).format('0,0.00'));
- //    	$("#pay_customer_cash").val(numeral(0).format('0,0.00'));
- //    	return false;
- //    }else{
- //    	var new_pay_cash = (parseFloat(pay_cash) - parseFloat(pay_wire));
-	// 	var pay_cash = $("#pay_customer_cash").val(numeral(new_pay_cash).format('0,0.00'));
- //    }
+    console.log(pay_cash)
+    console.log(pay_wire)
+
+    if(pay_cash < 0){
+    	$("#pay_customer_wire").val(numeral(customer_consideration).format('0,0.00'));
+    	$("#pay_customer_cash").val(numeral(0).format('0,0.00'));
+    	return false;
+    }else{
+    	var new_pay_cash = numeral(pay_cash).subtract(pay_wire);
+		var pay_cash = $("#pay_customer_cash").val(numeral(new_pay_cash).format('0,0.00'));
+    }
 }
 
 function togglePayCash() {
@@ -435,36 +442,43 @@ function addMoreBankField() {
 		// return
 		return false
 	}else{
-		$("#banks-addon").append(`
-			<div class="row" id="banks_addon_${totalBankFieldFileCount}">
-				<div class="col-sm-4" style="width: 50%;">
-	                <div class="form-group">
-	                    <label for="pay_customer_bank_name_${totalBankFieldFileCount}"> Bank Name
-			                <a href="javascript:void(0);" onclick="removeCustomerBank(${totalBankFieldFileCount})" class="float-right">
-								<i class="material-icons">clear</i>
-							</a>
-						</label>
-	                    <select class="form-control" id="pay_customer_bank_name_${totalBankFieldFileCount}">
-	                        <option value="">Select Bank</option>
-	                    </select>
-	                </div>
+		var pay_customer_wire = parseFloat($("#pay_customer_wire").val());
+		if(pay_customer_wire < 1){
+			notifyMe("danger", `Enter wire amount for customer before adding bank information!`);
+			// return
+			return false
+		}else{
+			$("#banks-addon").append(`
+				<div class="row" id="banks_addon_${totalBankFieldFileCount}">
+					<div class="col-sm-4" style="width: 50%;">
+		                <div class="form-group">
+		                    <label for="pay_customer_bank_name_${totalBankFieldFileCount}"> Bank Name
+				                <a href="javascript:void(0);" onclick="removeCustomerBank(${totalBankFieldFileCount})" class="float-right">
+									<i class="material-icons">clear</i>
+								</a>
+							</label>
+		                    <select class="form-control" id="pay_customer_bank_name_${totalBankFieldFileCount}">
+		                        <option value="">Select Bank</option>
+		                    </select>
+		                </div>
+		            </div>
+		            <div class="col-sm-4" style="width: 50%;">
+		                <div class="form-group">
+		                    <label for="customer_bank_nuban_${totalBankFieldFileCount}">Account Number</label>
+		                    <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="customer_bank_nuban_${totalBankFieldFileCount}">
+		                </div>
+		            </div>
+		            <div class="col-sm-4" style="width: 50%;">
+		                <div class="form-group">
+		                    <label for="amount_${totalBankFieldFileCount}">Amount</label>
+		                    <input type="text" pattern="[0-9.,]+" value="0.00" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="amount_${totalBankFieldFileCount}">
+		                </div>
+		            </div>
 	            </div>
-	            <div class="col-sm-4" style="width: 50%;">
-	                <div class="form-group">
-	                    <label for="customer_bank_nuban_${totalBankFieldFileCount}">Account Number</label>
-	                    <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="customer_bank_nuban_${totalBankFieldFileCount}">
-	                </div>
-	            </div>
-	            <div class="col-sm-4" style="width: 50%;">
-	                <div class="form-group">
-	                    <label for="amount_${totalBankFieldFileCount}">Amount</label>
-	                    <input type="text" pattern="[0-9.,]+" value="0.00" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="amount_${totalBankFieldFileCount}">
-	                </div>
-	            </div>
-            </div>
-		`);
-		preloadBankCodes(totalBankFieldFileCount, 1); // 1 means customer banks
-		totalBankFieldFileCount++;
+			`);
+			preloadBankCodes(totalBankFieldFileCount, 1); // 1 means customer banks
+			totalBankFieldFileCount++;
+		}
 	}
 }
 
@@ -472,7 +486,6 @@ function removeCustomerBank(addon_bank_id) {
 	// body...
 	totalBankFieldFileCount = (totalBankFieldFileCount - 1);
 	$(`#banks_addon_${addon_bank_id}`).remove();
-	console.log(totalBankFieldFileCount);
 }
 
 var totalReceiveBankFieldLimit = 3;
@@ -484,36 +497,44 @@ function addBDCMoreBankField() {
 		// return
 		return false
 	}else{
-		$("#receive-banks-addon").append(`
-			<div class="row" id="bdc_banks_addon_${totalReceiveBankFieldFileCount}">
-				<div class="col-sm-4" style="width: 50%;">
-	                <div class="form-group">
-	                    <label for="receive_bank_name_${totalReceiveBankFieldFileCount}">Bank Name
-	                    	<a href="javascript:void(0);" onclick="removeBDCBank(${totalReceiveBankFieldFileCount})" class="float-right">
-								<i class="material-icons">clear</i>
-							</a>
-	                    </label>
-	                    <select class="form-control" id="receive_bank_name_${totalReceiveBankFieldFileCount}">
-	                        <option value="">Select Bank</option>
-	                    </select>
-	                </div>
+		var receive_customer_wire = parseFloat($("#receive_customer_wire").val());
+		console.log(receive_customer_wire)
+		if(receive_customer_wire < 1 || isNaN(receive_customer_wire)){
+			notifyMe("danger", `Enter wire amount before adding bdc bank information!`);
+			// return
+			return false
+		}else{
+			$("#receive-banks-addon").append(`
+				<div class="row" id="bdc_banks_addon_${totalReceiveBankFieldFileCount}">
+					<div class="col-sm-4" style="width: 50%;">
+		                <div class="form-group">
+		                    <label for="receive_bank_name_${totalReceiveBankFieldFileCount}">Bank Name
+		                    	<a href="javascript:void(0);" onclick="removeBDCBank(${totalReceiveBankFieldFileCount})" class="float-right">
+									<i class="material-icons">clear</i>
+								</a>
+		                    </label>
+		                    <select class="form-control" id="receive_bank_name_${totalReceiveBankFieldFileCount}">
+		                        <option value="">Select Bank</option>
+		                    </select>
+		                </div>
+		            </div>
+		            <div class="col-sm-4" style="width: 50%;">
+		                <div class="form-group">
+		                    <label for="receive_bank_nuban_${totalReceiveBankFieldFileCount}">Account Number</label>
+		                    <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="receive_bank_nuban_${totalReceiveBankFieldFileCount}">
+		                </div>
+		            </div>
+		            <div class="col-sm-4" style="width: 50%;">
+		                <div class="form-group">
+		                    <label for="receive_amount_${totalReceiveBankFieldFileCount}">Amount</label>
+		                    <input type="text" pattern="[0-9.,]+" value="0.00" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="receive_amount_${totalReceiveBankFieldFileCount}">
+		                </div>
+		            </div>
 	            </div>
-	            <div class="col-sm-4" style="width: 50%;">
-	                <div class="form-group">
-	                    <label for="receive_bank_nuban_${totalReceiveBankFieldFileCount}">Account Number</label>
-	                    <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="receive_bank_nuban_${totalReceiveBankFieldFileCount}">
-	                </div>
-	            </div>
-	            <div class="col-sm-4" style="width: 50%;">
-	                <div class="form-group">
-	                    <label for="receive_amount_${totalReceiveBankFieldFileCount}">Amount</label>
-	                    <input type="text" pattern="[0-9.,]+" value="0.00" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="receive_amount_${totalReceiveBankFieldFileCount}">
-	                </div>
-	            </div>
-            </div>
-		`);
-		preloadBankCodes(totalReceiveBankFieldFileCount, 2); // 2 means bdc banks
-		totalReceiveBankFieldFileCount++;
+			`);
+			preloadBankCodes(totalReceiveBankFieldFileCount, 2); // 2 means bdc banks
+			totalReceiveBankFieldFileCount++;
+		}
 	}
 }
 
@@ -521,7 +542,6 @@ function removeBDCBank(addon_bank_id) {
 	// body...
 	totalReceiveBankFieldFileCount = (totalReceiveBankFieldFileCount - 1);
 	$(`#bdc_banks_addon_${addon_bank_id}`).remove();
-	console.log(totalReceiveBankFieldFileCount);
 }
 
 function preloadBankCodes(sn, type) {
@@ -649,7 +669,6 @@ function saveToQueue() {
 	// return 
 	return false;
 }
-
 
 // get banks
 getAvailableBanks();
