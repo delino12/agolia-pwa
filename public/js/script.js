@@ -154,7 +154,6 @@ function processUserLogin() {
 	return false;
 }
 
-
 /*
 |-----------------------------------------
 | FORMAT VOLUME INPUT
@@ -551,7 +550,7 @@ function addMoreBankField() {
 									<i class="material-icons">clear</i>
 								</a>
 							</label>
-		                    <select class="form-control" id="pay_customer_bank_name_${totalBankFieldFileCount}">
+		                    <select class="form-control" id="pay_customer_bank_name_${totalBankFieldFileCount}" required>
 		                        <option value="">Select Bank</option>
 		                    </select>
 		                </div>
@@ -559,13 +558,13 @@ function addMoreBankField() {
 		            <div class="col-sm-4" style="width: 50%;">
 		                <div class="form-group">
 		                    <label for="customer_bank_nuban_${totalBankFieldFileCount}">Account Number</label>
-		                    <input type="number" onkeyup="validateAccountNumber(this)" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="customer_bank_nuban_${totalBankFieldFileCount}">
+		                    <input type="number" onkeyup="validateAccountNumber(this)" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="customer_bank_nuban_${totalBankFieldFileCount}" required>
 		                </div>
 		            </div>
 		            <div class="col-sm-4" style="width: 50%;">
 		                <div class="form-group">
 		                    <label for="amount_${totalBankFieldFileCount}">Amount</label>
-		                    <input type="text" pattern="[0-9.,]+" value="0.00" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="amount_${totalBankFieldFileCount}">
+		                    <input type="text" pattern="[0-9.,]+" value="0.00" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="amount_${totalBankFieldFileCount}" required>
 		                </div>
 		            </div>
 	            </div>
@@ -607,7 +606,7 @@ function addBDCMoreBankField() {
 									<i class="material-icons">clear</i>
 								</a>
 		                    </label>
-		                    <select class="form-control" id="receive_bank_name_${totalReceiveBankFieldFileCount}">
+		                    <select class="form-control" id="receive_bank_name_${totalReceiveBankFieldFileCount}" required>
 		                        <option value="">Select Bank</option>
 		                    </select>
 		                </div>
@@ -615,13 +614,13 @@ function addBDCMoreBankField() {
 		            <div class="col-sm-4" style="width: 50%;">
 		                <div class="form-group">
 		                    <label for="receive_bank_nuban_${totalReceiveBankFieldFileCount}">Account Number</label>
-		                    <input type="number" class="form-control input-classic" onkeyup="validateAccountNumber(this)" placeholder="Eg, 002123330" step="any" min="0" id="receive_bank_nuban_${totalReceiveBankFieldFileCount}">
+		                    <input type="number" class="form-control input-classic" onkeyup="validateAccountNumber(this)" placeholder="Eg, 002123330" step="any" min="0" id="receive_bank_nuban_${totalReceiveBankFieldFileCount}" required>
 		                </div>
 		            </div>
 		            <div class="col-sm-4" style="width: 50%;">
 		                <div class="form-group">
 		                    <label for="receive_amount_${totalReceiveBankFieldFileCount}">Amount</label>
-		                    <input type="text" pattern="[0-9.,]+" value="0.00" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="receive_amount_${totalReceiveBankFieldFileCount}">
+		                    <input type="text" pattern="[0-9.,]+" value="0.00" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="receive_amount_${totalReceiveBankFieldFileCount}" required>
 		                </div>
 		            </div>
 	            </div>
