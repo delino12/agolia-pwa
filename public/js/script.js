@@ -313,6 +313,14 @@ function validatePhoneNumber(element) {
 	}
 }
 
+function validateAccountNumber(element) {
+	if(element.value.length > 10){
+		return element.value = element.value.slice(0, -1);
+	}else{
+		return element.value = element.value;
+	}
+}
+
 function getAvailableBanks() {
 	fetch(`/banks.json`).then(r => {
 		return r.json();
@@ -526,7 +534,7 @@ function addMoreBankField() {
 		            <div class="col-sm-4" style="width: 50%;">
 		                <div class="form-group">
 		                    <label for="customer_bank_nuban_${totalBankFieldFileCount}">Account Number</label>
-		                    <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="customer_bank_nuban_${totalBankFieldFileCount}">
+		                    <input type="number" onkeyup="validateAccountNumber(this)" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="customer_bank_nuban_${totalBankFieldFileCount}">
 		                </div>
 		            </div>
 		            <div class="col-sm-4" style="width: 50%;">
@@ -582,7 +590,7 @@ function addBDCMoreBankField() {
 		            <div class="col-sm-4" style="width: 50%;">
 		                <div class="form-group">
 		                    <label for="receive_bank_nuban_${totalReceiveBankFieldFileCount}">Account Number</label>
-		                    <input type="number" class="form-control input-classic" placeholder="Eg, 002123330" step="any" min="0" id="receive_bank_nuban_${totalReceiveBankFieldFileCount}">
+		                    <input type="number" class="form-control input-classic" onkeyup="validateAccountNumber(this)" placeholder="Eg, 002123330" step="any" min="0" id="receive_bank_nuban_${totalReceiveBankFieldFileCount}">
 		                </div>
 		            </div>
 		            <div class="col-sm-4" style="width: 50%;">
