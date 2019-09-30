@@ -1,5 +1,5 @@
-// const endpoint = 'http://localhost:8181';
-const endpoint = 'https://canary.timsmate.com';
+const endpoint = 'http://localhost:8181';
+// const endpoint = 'https://canary.timsmate.com';
 
 window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
@@ -209,39 +209,100 @@ function calculateEquivalent() {
     `);
 }
 
-function togglePayWire() {
-	var customer_consideration = $("#customer_consideration").val();
+function togglePayWire(element) {
+	var consideration = $("#customer_consideration").val();
 	var pay_cash = $("#pay_customer_cash").val();
 	var pay_wire = $("#pay_customer_wire").val();
 
 	pay_cash = pay_cash.replace(/,/g, "");
-	// pay_cash = pay_cash.replace(/./g, "");
     pay_wire = pay_wire.replace(/,/g, "");
-    // pay_wire = pay_wire.replace(/./g, "");
-    pay_cash = parseInt(pay_cash);
-    pay_wire = parseInt(pay_wire);
+    consideration = consideration.replace(/,/g, "");
 
-    console.log(pay_cash)
-    console.log(pay_wire)
+    pay_cash = parseFloat(pay_cash);
+    pay_wire = parseFloat(pay_wire);
+    consideration = parseFloat(consideration);
 
-    if(pay_cash < 0){
-    	$("#pay_customer_wire").val(numeral(customer_consideration).format('0,0.00'));
-    	$("#pay_customer_cash").val(numeral(0).format('0,0.00'));
-    	return false;
+	// var new_pay_cash = numeral(consideration).subtract(pay_wire);
+	var new_pay_cash = (consideration) - (pay_wire);
+    
+    if(new_pay_cash > 0){
+		$("#pay_customer_cash").val(numeral(new_pay_cash).format('0,0.00'));
     }else{
-    	var new_pay_cash = numeral(pay_cash).subtract(pay_wire);
-		var pay_cash = $("#pay_customer_cash").val(numeral(new_pay_cash).format('0,0.00'));
+    	$("#pay_customer_wire").val(consideration);
+    	$("#pay_customer_cash").val('0.00');
     }
 }
 
-function togglePayCash() {
-	// body
+function togglePayCash(element) {
+	var consideration = $("#customer_consideration").val();
+	var pay_cash = $("#pay_customer_cash").val();
 	var pay_wire = $("#pay_customer_wire").val();
+
+	pay_cash = pay_cash.replace(/,/g, "");
+    pay_wire = pay_wire.replace(/,/g, "");
+    consideration = consideration.replace(/,/g, "");
+
+    pay_cash = parseFloat(pay_cash);
+    pay_wire = parseFloat(pay_wire);
+    consideration = parseFloat(consideration);
+
+	// var new_pay_wire = numeral(consideration).subtract(pay_cash);
+	var new_pay_wire = (consideration) - (pay_cash);
+    
+    if(new_pay_wire > 0){
+		$("#pay_customer_wire").val(numeral(new_pay_wire).format('0,0.00'));
+    }else{
+    	$("#pay_customer_cash").val(consideration);
+    	$("#pay_customer_wire").val('0.00');
+    }
 }
 
-function toggleBalanceReceive() {
-	// toggle balancing
-	var balance = "";
+function toggleBdcReceiveWire(element) {
+	var consideration = $("#customer_volume").val();
+	var receive_cash = $("#receive_customer_cash").val();
+	var receive_wire = $("#receive_customer_wire").val();
+
+	receive_cash = receive_cash.replace(/,/g, "");
+    receive_wire = receive_wire.replace(/,/g, "");
+    consideration = consideration.replace(/,/g, "");
+
+    receive_cash = parseFloat(receive_cash);
+    receive_wire = parseFloat(receive_wire);
+    consideration = parseFloat(consideration);
+
+	// var new_receive_cash = numeral(consideration).subtract(receive_wire);
+	var new_receive_cash = (consideration) - (receive_wire);
+    
+    if(new_receive_cash > 0){
+		$("#receive_customer_cash").val(numeral(new_receive_cash).format('0,0.00'));
+    }else{
+    	$("#receive_customer_wire").val(consideration);
+    	$("#receive_customer_cash").val('0.00');
+    }
+}
+
+function toggleBdcReceiveCash(element) {
+	var consideration = $("#customer_volume").val();
+	var receive_cash = $("#receive_customer_cash").val();
+	var receive_wire = $("#receive_customer_wire").val();
+
+	receive_cash = receive_cash.replace(/,/g, "");
+    receive_wire = receive_wire.replace(/,/g, "");
+    consideration = consideration.replace(/,/g, "");
+
+    receive_cash = parseFloat(receive_cash);
+    receive_wire = parseFloat(receive_wire);
+    consideration = parseFloat(consideration);
+
+	// var new_receive_cash = numeral(consideration).subtract(receive_cash);
+	var new_receive_wire = (consideration) - (receive_cash);
+    
+    if(new_receive_wire > 0){
+		$("#receive_customer_wire").val(numeral(new_receive_wire).format('0,0.00'));
+    }else{
+    	$("#receive_customer_cash").val(consideration);
+    	$("#receive_customer_wire").val('0.00');
+    }
 }
 
 function validatePhoneNumber(element) {
