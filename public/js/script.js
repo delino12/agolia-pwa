@@ -1192,6 +1192,10 @@ function viewTransaction(trans_id) {
 					<td>${transaction.pay_wire}</td>
 				</tr>
 				<tr>
+					<td><b>Banks</b></td>
+					<td><div id="customer_banks"></div></td>
+				</tr>
+				<tr>
 					<td><br /><br /></td>
 					<td>------------</td>
 				</tr>
@@ -1212,6 +1216,19 @@ function viewTransaction(trans_id) {
 				<i class="material-icons">edit</i> <span class="print-title">Edit</span>
 			</button>
 		`);
+
+		$.each(transaction.bank_addons, async function(index, val) {
+			val.bank_name = await getBankByCode(val.bank_name).then(bank => bank);
+			// console.log(val);
+			$("#customer_banks").append(`
+				<div>
+					${val.bank_name} <br />
+					${val.bank_no} <br /><br />
+					<b>Amount:</b> ${val.amount}
+				</div>
+				<hr />
+			`);
+		});
 		$("#show-preview-transaction").modal();	
 	})
 }
