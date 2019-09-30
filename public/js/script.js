@@ -1,5 +1,5 @@
-const endpoint = 'http://localhost:8181';
-// const endpoint = 'https://canary.timsmate.com';
+// const endpoint = 'http://localhost:8181';
+const endpoint = 'https://canary.timsmate.com';
 
 window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
@@ -210,7 +210,13 @@ function calculateEquivalent() {
 }
 
 function togglePayWire(element) {
-	var consideration = $("#customer_consideration").val();
+	var trade_type = $("#trade_type").val();
+	var consideration;
+	if(trade_type == "2"){
+		consideration = $("#customer_volume").val();
+	}else if(trade_type == "1"){
+		consideration = $("#customer_consideration").val();
+	}
 	var pay_cash = $("#pay_customer_cash").val();
 	var pay_wire = $("#pay_customer_wire").val();
 
@@ -234,7 +240,14 @@ function togglePayWire(element) {
 }
 
 function togglePayCash(element) {
-	var consideration = $("#customer_consideration").val();
+	var trade_type = $("#trade_type").val();
+	var consideration;
+	if(trade_type == "2"){
+		consideration = $("#customer_volume").val();
+	}else if(trade_type == "1"){
+		consideration = $("#customer_consideration").val();
+	}
+
 	var pay_cash = $("#pay_customer_cash").val();
 	var pay_wire = $("#pay_customer_wire").val();
 
@@ -258,7 +271,13 @@ function togglePayCash(element) {
 }
 
 function toggleBdcReceiveWire(element) {
-	var consideration = $("#customer_volume").val();
+	var trade_type = $("#trade_type").val();
+	var consideration;
+	if(trade_type == "2"){
+		consideration = $("#customer_consideration").val();
+	}else if(trade_type == "1"){
+		consideration = $("#customer_volume").val();
+	}
 	var receive_cash = $("#receive_customer_cash").val();
 	var receive_wire = $("#receive_customer_wire").val();
 
@@ -282,7 +301,13 @@ function toggleBdcReceiveWire(element) {
 }
 
 function toggleBdcReceiveCash(element) {
-	var consideration = $("#customer_volume").val();
+	var trade_type = $("#trade_type").val();
+	var consideration;
+	if(trade_type == "2"){
+		consideration = $("#customer_consideration").val();
+	}else if(trade_type == "1"){
+		consideration = $("#customer_volume").val();
+	}
 	var receive_cash = $("#receive_customer_cash").val();
 	var receive_wire = $("#receive_customer_wire").val();
 
@@ -1014,28 +1039,30 @@ function getAllTransactions(start = 0, total = 10) {
 				    	shade = `class="text-danger"`;
 				    }
 
-				    // console.log(val);
-				    $("#load-all-transactions").append(`
-				        <tr ${shade}>
-				            <td>
-				            	<a href="javascript:void(0);" ${shade} onclick="viewTransaction(${val.id})">
-				                    ${val.name}
-				                </a> 
-				            </td>
-				            <td>${numeral(val.consideration).format('0,0.00')} <br /> (${numeral(val.volume).format('0,0.00')} * ${numeral(val.rate).format('0,0.00')})</td>
-				            <td>${val.currency}</td>
-				            <td>
-				            	<a href="javascript:void(0);" ${shade} onclick="previewReceipt(${val.id})">
-				                    <i class="material-icons py-1">print</i></a>
-				                </a> 
-				                <a href="javascript:void(0);" ${shade} onclick="syncTransaction(${val.id})" id="sync-icon-${val.id}">
-				                	<i class="material-icons py-1">cloud_upload</i>
-				                </a>
-				                <a href="javascript:void(0);" ${shade} onclick="deleteTransaction(${val.id})">
-				                <i class="material-icons py-1">restore_from_trash</i></a>
-				            </td>
-				        </tr>
-				    `);
+				    if(val.created_by == sessionStorage.username){
+				    	// console.log(val);
+					    $("#load-all-transactions").append(`
+					        <tr ${shade}>
+					            <td>
+					            	<a href="javascript:void(0);" ${shade} onclick="viewTransaction(${val.id})">
+					                    ${val.name}
+					                </a> 
+					            </td>
+					            <td>${numeral(val.consideration).format('0,0.00')} <br /> (${numeral(val.volume).format('0,0.00')} * ${numeral(val.rate).format('0,0.00')})</td>
+					            <td>${val.currency}</td>
+					            <td>
+					            	<a href="javascript:void(0);" ${shade} onclick="previewReceipt(${val.id})">
+					                    <i class="material-icons py-1">print</i></a>
+					                </a> 
+					                <a href="javascript:void(0);" ${shade} onclick="syncTransaction(${val.id})" id="sync-icon-${val.id}">
+					                	<i class="material-icons py-1">cloud_upload</i>
+					                </a>
+					                <a href="javascript:void(0);" ${shade} onclick="deleteTransaction(${val.id})">
+					                <i class="material-icons py-1">restore_from_trash</i></a>
+					            </td>
+					        </tr>
+					    `);
+				    }
 				});
 				
 			}else{

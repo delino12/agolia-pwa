@@ -116,13 +116,13 @@
                         <div class="col-sm-6" style="width: 50%;">
                             <div class="form-group">
                                 <label for="pay_customer_cash">Cash</label>
-                                <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="pay_customer_cash">
+                                <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" onblur="togglePayCash(this)" class="form-control input-classic" placeholder="0.00" id="pay_customer_cash">
                             </div>
                         </div>
                         <div class="col-sm-6" style="width: 50%;">
                             <div class="form-group">
                                 <label for="pay_customer_wire">Wire</label>
-                                <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="pay_customer_wire">
+                                <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" onblur="togglePayWire(this)" class="form-control input-classic" placeholder="0.00" id="pay_customer_wire">
                             </div>
                         </div>
                     </div>
@@ -150,13 +150,13 @@
                         <div class="col-sm-6" style="width: 50%;">
                             <div class="form-group">
                                 <label for="receive_customer_cash">Cash</label>
-                                <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="receive_customer_cash">
+                                <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" onblur="toggleBdcReceiveCash(this)" class="form-control input-classic" placeholder="0.00" id="receive_customer_cash">
                             </div>
                         </div>
                         <div class="col-sm-6" style="width: 50%;">
                             <div class="form-group">
                                 <label for="receive_customer_wire">Wire</label>
-                                <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" class="form-control input-classic" placeholder="0.00" id="receive_customer_wire">
+                                <input type="text" pattern="[0-9.,]+" onkeyup="formatVolume(this)" onblur="toggleBdcReceiveWire(this)" class="form-control input-classic" placeholder="0.00" id="receive_customer_wire">
                             </div>
                         </div>
                     </div>
