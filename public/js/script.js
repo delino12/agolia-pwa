@@ -1370,14 +1370,6 @@ function previewReceipt(trans_id, trans_type) {
 					<td>${transaction.pay_wire}</td>
 				</tr>
 				<tr>
-					<td><b>Bank Name</b></td>
-					<td>${transaction.pay_bank_name}</td>
-				</tr>
-				<tr>
-					<td><b>Account No.</b></td>
-					<td>${transaction.pay_bank_nuban}</td>
-				</tr>
-				<tr>
 					<td><br /><br /></td>
 					<td>------------</td>
 				</tr>
@@ -1412,15 +1404,6 @@ function previewReceipt(trans_id, trans_type) {
 					<td><b>Wire</b></td>
 					<td>${transaction.pay_wire}</td>
 				</tr>
-				<tr>
-					<td><b>Bank Name</b></td>
-					<td>${transaction.pay_bank_name}</td>
-				</tr>
-				<tr>
-					<td><b>Account No.</b></td>
-					<td>${transaction.pay_bank_nuban}</td>
-				</tr>
-
 				<tr>
 					<td><br /><br /></td>
 					<td>------------</td>
@@ -1464,6 +1447,11 @@ function previewReceipt(trans_id, trans_type) {
 				</tr>
 				
 				${naration}
+				
+				<tr>
+					<td><b>Banks</b></td>
+					<td><div id="prev_customer_banks"></div></td>
+				</tr>
 
 				<tr>
 					<td><br /><br /></td>
@@ -1482,6 +1470,20 @@ function previewReceipt(trans_id, trans_type) {
 				<i class="material-icons">email</i> <span class="print-title">Email Receipt</span>
 			</button>
 		`);
+
+		$.each(transaction.bank_addons, async function(index, val) {
+			val.bank_name = await getBankByCode(val.bank_name).then(bank => bank);
+			// console.log(val);
+			$("#prev_customer_banks").append(`
+				<div>
+					${val.bank_name} <br />
+					${val.bank_no} <br /><br />
+					<b>Amount:</b> ${val.amount}
+				</div>
+				<hr />
+			`);
+		});
+
 		$("#show-preview-modal").modal();
 	})
 }
@@ -1563,14 +1565,6 @@ function emailReceipt(trans_id) {
 					<td>${transaction.pay_wire}</td>
 				</tr>
 				<tr>
-					<td><b>Bank Name</b></td>
-					<td>${transaction.pay_bank_name}</td>
-				</tr>
-				<tr>
-					<td><b>Account No.</b></td>
-					<td>${transaction.pay_bank_nuban}</td>
-				</tr>
-				<tr>
 					<td><br /><br /></td>
 					<td>------------</td>
 				</tr>
@@ -1606,15 +1600,6 @@ function emailReceipt(trans_id) {
 					<td>${transaction.pay_wire}</td>
 				</tr>
 				<tr>
-					<td><b>Bank Name</b></td>
-					<td>${transaction.pay_bank_name}</td>
-				</tr>
-				<tr>
-					<td><b>Account No.</b></td>
-					<td>${transaction.pay_bank_nuban}</td>
-				</tr>
-
-				<tr>
 					<td><br /><br /></td>
 					<td>------------</td>
 				</tr>
@@ -1632,7 +1617,7 @@ function emailReceipt(trans_id) {
 				</tr>
 			`
 		}
-
+		
 		var data = `
 			<div class="text-center">
 				<center>
@@ -1670,6 +1655,9 @@ function emailReceipt(trans_id) {
 				</tr>
 			</table>
 		`;
+
+		$("#show-preview-modal").modal();
+
 		var to = transaction.email;
 		var cc = transaction.email_addons;
 		var query = {data, to, cc}
