@@ -1,5 +1,5 @@
-// const endpoint = 'http://localhost:8181';
-const endpoint = 'https://canary.timsmate.com';
+const endpoint = 'http://localhost:8181';
+// const endpoint = 'https://canary.timsmate.com';
 
 window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
@@ -771,6 +771,7 @@ function saveToQueue() {
 getAvailableBanks();
 setDefaultCurrency();
 getAllTransactions(0, 10);
+getCompletedTransactions(0, 10);
 
 /*
 |-----------------------------------------
@@ -850,8 +851,35 @@ function countLocalUserData() {
 	})
 }
 
+// count total local transactions from cloud data
+function countLocalTransactionsFromLiveData() {
+	// init database
+	const db = openDatabase();
+	return new Promise((resolve, reject) => {
+		// on success fetch data
+		db.onsuccess = function(event) {
+			// Do something with request.result!
+			var query = event.target.result;
+		  	var transactions_media = query.transaction("transactions_media").objectStore("transactions_media").count();
+
+		  	transactions_media.onsuccess = function(event){
+		  		// show total
+		  		// console.log(event);
+		  		resolve(event.target.result)
+		  	}
+
+		  	transactions_media.onerror = function(event){
+		  		reject(event.target.result);
+		  	}
+		}
+	})
+}
+
 // fetch users from cloud
 fetchUsersFromCloud();
+
+// fetch transactions from cloud
+fetchTransactionsFromCloud();
 
 // fetch users from cloud
 async function fetchUsersFromCloud() {
@@ -863,6 +891,21 @@ async function fetchUsersFromCloud() {
 		// console.log(users);
 		users.forEach(function(user) {
 			saveToUsers(user);
+		})
+	}
+}
+
+// fetch transactions from cloud
+async function fetchTransactionsFromCloud() {
+	// body...
+	var total_transactions = await resolveTotalTransactions().then(total => total);
+	var total_offline_transactions = await countLocalTransactionsFromLiveData().then(total => total);
+
+	if(total_transactions > total_offline_transactions){
+		var transactions = await resolveAllAgentTransaction().then(transactions => transactions);
+		// console.log(users);
+		transactions.forEach(function(transact) {
+			saveCloudToLocalTransaction(transact);
 		})
 	}
 }
@@ -895,6 +938,52 @@ function resolveAllServerUsers() {
 			reject(err)
 		})
 	})
+}
+
+// resolve total transactions
+function resolveTotalTransactions() {
+	return new Promise((resolve, reject) => {
+		fetch(`${endpoint}/api/count/transaction?agent_code=${sessionStorage.username}`).then(r => {
+			return r.json();
+		}).then(results => {
+			console.log(results)
+			resolve(results)
+		}).catch(err => {
+			console.log(err)
+			reject(err)
+		})
+	})
+}
+
+// resolve all transactions from cloud
+function resolveAllAgentTransaction() {
+	return new Promise((resolve, reject) => {
+		fetch(`${endpoint}/api/all/transaction?agent_code=${sessionStorage.username}`).then(r => {
+			return r.json();
+		}).then(results => {
+			console.log(results)
+			resolve(results)
+		}).catch(err => {
+			console.log(err)
+			reject(err)
+		})
+	})
+}
+
+// save to transactions
+function saveCloudToLocalTransaction(payload) {
+	// body...
+	const db = openDatabase();
+
+	// on success add user
+	db.onsuccess = (event) => {
+		const query = event.target.result;
+		const transactions_media = query.transaction("transactions_media", "readwrite").objectStore("transactions_media");
+		transactions_media.add(payload);
+
+		// return 
+		return true;
+	}
 }
 
 // save to users
@@ -976,6 +1065,24 @@ function countData() {
 	  		// show total
 	  		totalUsers = event.target.result;
 	  		$(".total-transactions").html('Total: ' + event.target.result);
+	  	}
+	}
+}
+
+// count total completed data
+function countCompletedData() {
+	// init database
+	const db = openDatabase();
+	// on success fetch data
+	db.onsuccess = function(event) {
+		// Do something with request.result!
+		var query = event.target.result;
+	  	var transactions = query.transaction("transactions_media").objectStore("transactions_media").count();
+
+	  	transactions.onsuccess = function(event){
+	  		// show total
+	  		totalUsers = event.target.result;
+	  		$(".total-completed").html('Total: ' + event.target.result);
 	  	}
 	}
 }
@@ -1072,6 +1179,92 @@ function getAllTransactions(start = 0, total = 10) {
 	};
 }
 
+// get all transactions 
+function getCompletedTransactions(start = 0, total = 10) {
+	// count transactions 
+	countCompletedData()
+
+	// init database
+	const db = openDatabase();
+
+	// on success fetch data
+	db.onsuccess = function(event) {
+
+		// Do something with request.result!
+		var query = event.target.result;
+	  	var transactions_media = query.transaction("transactions_media", "readonly").objectStore("transactions_media").openCursor();
+	  	var transactions_box = [];
+
+	  	console.log('start='+start+' total='+total);
+		var hasSkipped = false;
+
+	  	// wait for users to arrive
+	  	transactions_media.onsuccess = (event) => {
+	  		var cursor = event.target.result;
+	  		
+	  		// check if data set has next
+	  		if(!hasSkipped && start > 0) {
+				hasSkipped = true;
+				cursor.advance(start);
+				return;
+			}
+
+			if(cursor){
+				// push new scanned data
+				transactions_box.push(cursor.value);
+				if(transactions_box.length < total) {
+					// keep pushing
+					cursor.continue();
+				}
+				// console.log('start reading dataset is ready');
+				var sn = 0;
+				$("#load-all-transactions-media").html("");
+				$.each(transactions_box, function(index, val) {
+				    sn++;
+				    if(val.currency == "2"){
+				    	val.currency = "USD";
+				    }else if(val.currency == "4"){
+				    	val.currency = "EUR";
+				    }else if(val.currency == "3"){
+				    	val.currency = "GBP";
+				    }
+
+				    // shade
+				    let shade;
+				    if(val.trade_type == "1"){
+				    	shade = `class="text-success"`;
+				    }else if(val.trade_type == "2"){
+				    	shade = `class="text-danger"`;
+				    }
+
+				    if(val.created_by == sessionStorage.username){
+				    	// console.log(val);
+					    $("#load-all-transactions-media").append(`
+					        <tr ${shade}>
+					            <td>
+					            	<a href="javascript:void(0);" ${shade} onclick="viewCompletedTransaction(${val.id})">
+					                    ${val.customer}
+					                </a> 
+					            </td>
+					            <td>${numeral(val.consideration).format('0,0.00')} <br /> (${numeral(val.volume).format('0,0.00')} * ${numeral(val.rate).format('0,0.00')})</td>
+					            <td>${val.currency}</td>
+					            <td>
+					            	<a href="javascript:void(0);" ${shade} onclick="previewCompletedReceipt(${val.id})">
+					                    <i class="material-icons py-1">print</i></a>
+					                </a> 
+					            </td>
+					        </tr>
+					    `);
+				    }
+				});
+			}else{
+				// console log value
+				console.log('No result set found!');
+			}
+	  	}
+	};
+}
+
 // get transaction by id
 function getOneTransaction(trans_id) {
 	const db = openDatabase();
@@ -1089,6 +1282,29 @@ function getOneTransaction(trans_id) {
 
 		  	// on error
 		  	transaction.onerror = (event) => {
+		  		reject(event.target.result)
+		  	}
+		}
+	})
+}
+
+// get transaction by id
+function getOneCompletedTransaction(trans_id) {
+	const db = openDatabase();
+
+	return new Promise((resolve, reject) => {
+		db.onsuccess = (event) => {
+			// Do something with request.result!
+			var query = event.target.result;
+		  	var transactions_media = query.transaction("transactions_media").objectStore("transactions_media").get(trans_id);
+
+		  	// on success
+		  	transactions_media.onsuccess = (event) => {
+		  		resolve(event.target.result);
+		  	}
+
+		  	// on error
+		  	transactions_media.onerror = (event) => {
 		  		reject(event.target.result)
 		  	}
 		}
@@ -1212,9 +1428,141 @@ function viewTransaction(trans_id) {
 					<td>${transaction.receive_wire}</td>
 				</tr>
 			</table>
-			<button class="btn btn-flat float-right">
-				<i class="material-icons">edit</i> <span class="print-title">Edit</span>
-			</button>
+		`);
+
+		$.each(transaction.bank_addons, async function(index, val) {
+			val.bank_name = await getBankByCode(val.bank_name).then(bank => bank);
+			// console.log(val);
+			$("#customer_banks").append(`
+				<div>
+					${val.bank_name} <br />
+					${val.bank_no} <br /><br />
+					<b>Amount:</b> ${val.amount}
+				</div>
+				<hr />
+			`);
+		});
+		$("#show-preview-transaction").modal();	
+	})
+}
+
+// view transaction
+function viewCompletedTransaction(trans_id) {
+	getOneCompletedTransaction(trans_id).then(async transaction => {
+		if(transaction.currency == "2"){
+			transaction.currency = "USD - Dollar";
+		}else if(transaction.currency == "4"){
+			transaction.currency = "EUR - Euro";
+		}else if(transaction.currency == "3"){
+			transaction.currency = "GBP - Pounds";
+		}
+
+		var pay_currency;
+		var receive_currency;
+
+		if(transaction.trade_type == "1"){
+			pay_currency = "NGN - Naira";
+			receive_currency = transaction.currency;
+			$("#transaction-title").html(`
+				<span class="text-success">Transaction Details - BUY</span>
+			`);
+		}
+
+		if(transaction.trade_type == "2"){
+			pay_currency = transaction.currency;
+			receive_currency = "NGN - Naira";
+			$("#transaction-title").html(`
+				<span class="text-danger">Transaction Details - SELL</span>
+			`);
+		}
+
+		if(transaction.pay_bank_name){
+			transaction.pay_bank_name = await getBankByCode(transaction.pay_bank_name).then(bank_name => bank_name)
+		}
+
+		if(transaction.receive_bank_name){
+			transaction.receive_bank_name = await getBankByCode(transaction.receive_bank_name).then(bank_name => bank_name)
+		}
+
+		transaction.volume 		 = numeral(transaction.volume).format('0,0.00');
+		transaction.rate 		 = numeral(transaction.rate).format('0,0.00');
+		transaction.pay_cash	 = numeral(transaction.pay_cash).format('0,0.00');
+		transaction.pay_wire 	 = numeral(transaction.pay_wire).format('0,0.00');
+		transaction.receive_cash = numeral(transaction.receive_cash).format('0,0.00');
+		transaction.receive_wire = numeral(transaction.receive_wire).format('0,0.00');
+		transaction.consideration = numeral(transaction.consideration).format('0,0.00');
+		
+		$("#show-transaction-data").html(`
+			<table class="table">
+				<tr>
+					<td><b>Customer</b></td>
+					<td>${transaction.customer}</td>
+				</tr>
+				<tr>
+					<td><b>Email</b></td>
+					<td>${transaction.email}</td>
+				</tr>
+				<tr>
+					<td><b>Phone</b></td>
+					<td>${transaction.phone}</td>
+				</tr>
+				<tr>
+					<td><b>Currency</b></td>
+					<td>${transaction.currency}</td>
+				</tr>
+				<tr>
+					<td><b>Volume</b></td>
+					<td>${transaction.volume}</td>
+				</tr>
+				<tr>
+					<td><b>Rate</b></td>
+					<td>${transaction.rate}</td>
+				</tr>
+				<tr>
+					<td><b>Consideration</b></td>
+					<td>${transaction.consideration}</td>
+				</tr>
+				<tr>
+					<td><b>Date</b></td>
+					<td>${transaction.created_at}</td>
+				</tr>
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>Pay</b></td>
+					<td>${pay_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.pay_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.pay_wire}</td>
+				</tr>
+				<tr>
+					<td><b>Banks</b></td>
+					<td><div id="customer_banks"></div></td>
+				</tr>
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>Receive</b></td>
+					<td>${receive_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.receive_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.receive_wire}</td>
+				</tr>
+			</table>
 		`);
 
 		$.each(transaction.bank_addons, async function(index, val) {
@@ -1486,6 +1834,200 @@ function previewReceipt(trans_id, trans_type) {
 
 		$("#show-preview-modal").modal();
 	})
+}
+
+// view transaction
+function previewCompletedReceipt(trans_id, trans_type) {
+	getOneCompletedTransaction(trans_id).then(async transaction => {
+		if(transaction.currency == "2"){
+			transaction.currency = "USD - Dollar";
+		}else if(transaction.currency == "4"){
+			transaction.currency = "EUR - Euro";
+		}else if(transaction.currency == "3"){
+			transaction.currency = "GBP - Pounds";
+		}
+
+		var pay_currency;
+		var receive_currency;
+		var pay_title;
+		var receive_title;
+		var consid_currency_lite = "NGN";
+
+		var naration;
+
+		if(transaction.trade_type == "1"){
+			pay_currency = "NGN - Naira";
+			receive_currency = transaction.currency;
+			$("#receipt-title").html(`
+				<span class="text-success">Receipt</span>
+			`);
+			transaction.trade_type = "Sold";
+			pay_title = "Receive";
+			receive_title = "Pay";
+		}
+
+		if(transaction.trade_type == "2"){
+			pay_currency = transaction.currency;
+			receive_currency = "NGN - Naira";
+			$("#receipt-title").html(`
+				<span class="text-danger">Receipt</span>
+			`);
+			transaction.trade_type = "Purchased";
+			pay_title = "Pay";
+			receive_title = "Receive";
+		}
+
+		if(transaction.pay_bank_name){
+			transaction.pay_bank_name = await getBankByCode(transaction.pay_bank_name).then(bank_name => bank_name)
+		}
+
+		if(transaction.receive_bank_name){
+			transaction.receive_bank_name = await getBankByCode(transaction.receive_bank_name).then(bank_name => bank_name)
+		}
+
+		transaction.volume 		 = numeral(transaction.volume).format('0,0.00');
+		transaction.rate 		 = numeral(transaction.rate).format('0,0.00');
+		transaction.pay_cash	 = numeral(transaction.pay_cash).format('0,0.00');
+		transaction.pay_wire 	 = numeral(transaction.pay_wire).format('0,0.00');
+		transaction.receive_cash = numeral(transaction.receive_cash).format('0,0.00');
+		transaction.receive_wire = numeral(transaction.receive_wire).format('0,0.00');
+		transaction.consideration = numeral(transaction.consideration).format('0,0.00');
+
+		if(transaction.trade_type == "Sold"){
+			naration = `
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>${pay_title}</b></td>
+					<td>${pay_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.pay_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.pay_wire}</td>
+				</tr>
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>${receive_title}</b></td>
+					<td>${receive_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.receive_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.receive_wire}</td>
+				</tr>
+			`
+		}else if(transaction.trade_type == "Purchased"){
+			naration = `
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>${receive_title}</b></td>
+					<td>${pay_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.pay_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.pay_wire}</td>
+				</tr>
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>${pay_title}</b></td>
+					<td>${receive_currency}</td>
+				</tr>
+				<tr>
+					<td><b>Cash</b></td>
+					<td>${transaction.receive_cash}</td>
+				</tr>
+				<tr>
+					<td><b>Wire</b></td>
+					<td>${transaction.receive_wire}</td>
+				</tr>
+			`
+		}
+		
+
+		$("#show-preview-data").html(`
+			<div class="text-center">
+				<img src="/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> <span class="text-primary">SEBASTIAN BDC</span>
+			</div>
+			<table class="table">
+				<tr>
+					<td><b>Customer</b></td>
+					<td>${transaction.customer}</td>
+				</tr>
+				<tr>
+					<td><b>Transaction</b></td>
+					<td>${transaction.trade_type} ${transaction.volume} ${transaction.currency} @ ${transaction.rate} </td>
+				</tr>
+				<tr>
+					<td><b>Consideration</b></td>
+					<td>${consid_currency_lite} ${transaction.consideration}</td>
+				</tr>
+				<tr>
+					<td><b>Agent ID</b></td>
+					<td>${transaction.updated_by}</td>
+				</tr>
+				
+				${naration}
+				
+				<tr>
+					<td><b>Banks</b></td>
+					<td><div id="prev_customer_banks"></div></td>
+				</tr>
+
+				<tr>
+					<td><br /><br /></td>
+					<td>------------</td>
+				</tr>
+				<tr>
+					<td><b>Date</b></td>
+					<td>${transaction.created_at}</td>
+				</tr>
+			</table>
+
+			<button class="btn btn-flat" onclick="PrintElem(${trans_id})" id="print-deal-slip">
+				<i class="material-icons">print</i> <span class="print-title">Print</span>
+			</button>
+			<button class="btn btn-flat float-right" onclick="emailReceipt(${trans_id})" id="email-deal-slip">
+				<i class="material-icons">email</i> <span class="print-title">Email Receipt</span>
+			</button>
+		`);
+
+		$.each(transaction.bank_addons, async function(index, val) {
+			val.bank_name = await getBankByCode(val.bank_name).then(bank => bank);
+			// console.log(val);
+			$("#prev_customer_banks").append(`
+				<div>
+					${val.bank_name} <br />
+					${val.bank_no} <br /><br />
+					<b>Amount:</b> ${val.amount}
+				</div>
+				<hr />
+			`);
+		});
+
+		$("#show-preview-modal").modal();
+	}).catch(err => console.log(err))
 }
 
 function emailReceipt(trans_id) {
