@@ -1,5 +1,5 @@
-const endpoint = 'http://localhost:8181';
-// const endpoint = 'https://canary.timsmate.com';
+// const endpoint = 'http://localhost:8181';
+const endpoint = 'https://canary.timsmate.com';
 
 window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
