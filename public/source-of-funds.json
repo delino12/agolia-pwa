@@ -1,0 +1,70 @@
+{
+	"status": true,
+	"message": "Source of funds retrieved",
+	"data": [
+	    {
+	      "name": "Salary",
+	      "id": "1"
+	    },
+	    {
+	      "name": "Tuttion Fee",
+	      "id": "2"
+	    },
+	    {
+	      "name": "Government Grant",
+	      "id": "3"
+	    },
+	    {
+	      "name": "Gift & Awards",
+	      "id": "4"
+	    },
+	    {
+	      "name": "Lottery Prize",
+	      "id": "5"
+	    },
+	    {
+	      "name": "Gaming & Bet Win",
+	      "id": "6"
+	    },
+	    {
+	      "name": "Grants from Scholarship",
+	      "id": "7"
+	    },
+	    {
+	      "name": "Loans",
+	      "id": "8"
+	    },
+	    {
+	      "name": "Travel allowance",
+	      "id": "9"
+	    },
+	    {
+	      "name": "Salary allowance",
+	      "id": "10"
+	    },
+	    {
+	      "name": "Crypto currency payment",
+	      "id": "11"
+	    },
+	    {
+	      "name": "Wire Transfer",
+	      "id": "12"
+	    },
+	    {
+	      "name": "Real estate",
+	      "id": "13"
+	    },
+	    {
+	      "name": "Medical Bills",
+	      "id": "14"
+	    },
+	    {
+	      "name": "Entertainment",
+	      "id": "15"
+	    },
+	    {
+	      "name": "Business",
+	      "id": "16"
+	    }
+   	]
+}

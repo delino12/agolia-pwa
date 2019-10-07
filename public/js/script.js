@@ -670,6 +670,23 @@ function preloadBankCodes(sn, type) {
 	})
 }
 
+function sourceOfFunds() {
+	fetch(`/source-of-funds.json`).then(r => r.json()).then(results => {
+		console.log(results)
+		$("#source_of_funds").html("");
+		$("#source_of_funds").append(`
+			<option value=""> -- select -- </option>
+		`);
+		$.each(results.data, function(index, val) {
+			$("#source_of_funds").append(`
+				<option value="${val.id}"> ${val.name} </option>
+			`);
+		});
+	}).catch(err => {
+		console.log(err);
+	})
+}
+
 function saveToQueue() {
 	var consideration       = $("#customer_consideration").val();
 	var name 				= $("#customer_name").val();
@@ -695,6 +712,7 @@ function saveToQueue() {
 	var documents       	= files_box;
 	var email_addons        = email_fields_box;
 	var transport_charges   = $("#transport_charges").val();
+	var source_of_funds     = $("#source_of_funds").val();
 
 	var bank_addons = [];
 	for(var i = 0; i < totalBankFieldFileCount; i++){
@@ -753,7 +771,7 @@ function saveToQueue() {
 		}
     }
 
-	var query = {name, email, phone, currency, volume, rate, pay_cash, pay_wire, pay_bank_name, pay_bank_nuban, receive_cash, receive_wire, receive_bank_name, receive_bank_nuban, consideration, trade_type, created_at, updated_at, created_by, updated_by, documents, email_addons, transport_charges, bank_addons, bdc_bank_addons, comment}
+	var query = {name, email, phone, currency, volume, rate, pay_cash, pay_wire, pay_bank_name, pay_bank_nuban, receive_cash, receive_wire, receive_bank_name, receive_bank_nuban, consideration, trade_type, created_at, updated_at, created_by, updated_by, documents, email_addons, transport_charges, bank_addons, bdc_bank_addons, comment, source_of_funds}
 	// console.log(query);
 
 	// save to offline db
@@ -767,7 +785,7 @@ function saveToQueue() {
 	return false;
 }
 
-// get banks
+sourceOfFunds();
 getAvailableBanks();
 setDefaultCurrency();
 getAllTransactions(0, 10);
@@ -1027,6 +1045,31 @@ function attempLogin(username, passcode) {
 			    }else{
 			    	resolve(false)
 			    }
+			}
+		}
+	})
+}
+
+// login agent
+function getUserByAgentCode(username) {
+	const db = openDatabase();
+	return new Promise((resolve, reject) => {
+		// on success add user
+		db.onsuccess = (event) => {
+			const query = event.target.result;
+			const users = query.transaction("users", "readwrite").objectStore("users").getAll();
+		
+			users.onsuccess = function(event){
+				var all_users = event.target.result;	
+		    	for(var i =0; i < all_users.length; i++) {
+			        if(username == all_users[i].agent_code){
+			            resolve(all_users[i].name);
+			        }
+			    }
+			}
+
+			users.onerror = function(event){
+				reject('Error retrieving data by agent code');
 			}
 		}
 	})
@@ -1349,6 +1392,8 @@ function viewTransaction(trans_id) {
 			transaction.receive_bank_name = await getBankByCode(transaction.receive_bank_name).then(bank_name => bank_name)
 		}
 
+		transaction.source_of_funds = await getSourceOfFunds(transaction.source_of_funds).then(funds_source => funds_source)
+
 		transaction.volume 		 = numeral(transaction.volume).format('0,0.00');
 		transaction.rate 		 = numeral(transaction.rate).format('0,0.00');
 		transaction.pay_cash	 = numeral(transaction.pay_cash).format('0,0.00');
@@ -1370,6 +1415,10 @@ function viewTransaction(trans_id) {
 				<tr>
 					<td><b>Phone</b></td>
 					<td>${transaction.phone}</td>
+				</tr>
+				<tr>
+					<td><b>Source of Funds</b></td>
+					<td>${transaction.source_of_funds}</td>
 				</tr>
 				<tr>
 					<td><b>Currency</b></td>
@@ -1437,7 +1486,7 @@ function viewTransaction(trans_id) {
 				<div>
 					${val.bank_name} <br />
 					${val.bank_no} <br /><br />
-					<b>Amount:</b> ${val.amount}
+					<b>Amount:</b> ${numeral(val.amount).format('0,0.00')}
 				</div>
 				<hr />
 			`);
@@ -1572,7 +1621,7 @@ function viewCompletedTransaction(trans_id) {
 				<div>
 					${val.bank_name} <br />
 					${val.bank_no} <br /><br />
-					<b>Amount:</b> ${val.amount}
+					<b>Amount:</b> ${numeral(val.amount).format('0,0.00')}
 				</div>
 				<hr />
 			`);
@@ -1690,6 +1739,8 @@ function previewReceipt(trans_id, trans_type) {
 		if(transaction.receive_bank_name){
 			transaction.receive_bank_name = await getBankByCode(transaction.receive_bank_name).then(bank_name => bank_name)
 		}
+
+		transaction.updated_by = await getUserByAgentCode(transaction.updated_by).then(agent => agent);
 
 		transaction.volume 		 = numeral(transaction.volume).format('0,0.00');
 		transaction.rate 		 = numeral(transaction.rate).format('0,0.00');
@@ -1826,7 +1877,7 @@ function previewReceipt(trans_id, trans_type) {
 				<div>
 					${val.bank_name} <br />
 					${val.bank_no} <br /><br />
-					<b>Amount:</b> ${val.amount}
+					<b>Amount:</b> ${numeral(val.amount).format('0,0.00')}
 				</div>
 				<hr />
 			`);
@@ -2020,7 +2071,7 @@ function previewCompletedReceipt(trans_id, trans_type) {
 				<div>
 					${val.bank_name} <br />
 					${val.bank_no} <br /><br />
-					<b>Amount:</b> ${val.amount}
+					<b>Amount:</b> ${numeral(val.amount).format('0,0.00')}
 				</div>
 				<hr />
 			`);
@@ -2256,6 +2307,45 @@ function getBankByCode(bank_code) {
 			reject(err)
 		})
 	});
+}
+
+// resolve source of funds
+function getSourceOfFunds(fund_source_id) {
+	return new Promise((resolve, reject) => {
+		fetch(`/source-of-funds.json`).then(r => {
+			return r.json();
+		}).then(results => {
+			// console.log(results)
+			$.each(results.data, function(index, source) {
+				/* iterate through array or object */
+				if(fund_source_id == source.id){
+					resolve(source.name)
+				}
+			});
+		}).catch(err => {
+			reject(err)
+		})
+	});
+}
+
+// resolve source of funds
+function resolveSourceOfFunds() {
+	// body...
+	return new Promise((resolve, reject) => {
+		fetch(`/source-of-funds`).then(r => {
+			return r.json();
+		}).then(results => {
+			console.log(results)
+			resolve(results)
+		}).catch(err => {
+			console.log(err);
+			reject(err);
+		})
+	});
+}
+
+function getAgentInformation() {
+	
 }
 
 function printReceipt() {
