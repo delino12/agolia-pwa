@@ -717,6 +717,10 @@ function saveToQueue() {
 	var transport_charges   = $("#transport_charges").val();
 	var source_of_funds     = $("#source_of_funds").val();
 
+	if(email == ""){
+		email = "--";
+	}
+
 	var bank_addons = [];
 	for(var i = 0; i < totalBankFieldFileCount; i++){
 		bank_addons.push({
