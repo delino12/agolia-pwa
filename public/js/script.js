@@ -813,6 +813,7 @@ function openDatabase() {
 	// on error catch errors 
 	database.onerror = (event) => {
 		console.log('error opening web database');
+		console.log(event.target.result);
 	};
 
 	// check db version
