@@ -808,7 +808,7 @@ if (!window.indexedDB) {
 function openDatabase() {
 	// return db instances
 	const DB_NAME 	= 'sebastianfx_db';
-	const database 	= indexedDB.open(DB_NAME, DB_VERSION);
+	const database 	= indexedDB.open(DB_NAME, 1);
 
 	// on error catch errors 
 	database.onerror = (event) => {
