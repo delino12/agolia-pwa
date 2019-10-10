@@ -1,6 +1,9 @@
 // const endpoint = 'http://localhost:8181';
 const endpoint = 'https://canary.timsmate.com';
 
+// db version
+const DB_VERSION = 1;
+
 window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
 		// register the service worker
@@ -805,7 +808,7 @@ if (!window.indexedDB) {
 function openDatabase() {
 	// return db instances
 	const DB_NAME 	= 'sebastianfx_db';
-	const database 	= indexedDB.open(DB_NAME, 2);
+	const database 	= indexedDB.open(DB_NAME, DB_VERSION);
 
 	// on error catch errors 
 	database.onerror = (event) => {
