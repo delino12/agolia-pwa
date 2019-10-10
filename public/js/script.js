@@ -1648,7 +1648,7 @@ function syncTransaction(trans_id) {
   			dataType: 'json',
   			data: transaction,
   			success: function(data){
-  				console.log(data);
+  				// console.log(data);
   				if(data.status == 'success'){
   					notifyMe("success", data.message);
 					$(`#sync-icon-${trans_id}`).html(`
@@ -1656,7 +1656,7 @@ function syncTransaction(trans_id) {
 					`);
 
 					// lose cargo
-					// deleteTransaction(trans_id);
+					deleteTransaction(trans_id);
   				}else{
   					notifyMe("danger", data.message);
 					$(`#sync-icon-${trans_id}`).html(`
@@ -1689,10 +1689,10 @@ function deleteTransaction(trans_id) {
 
 	  	// destroy id
   		transactions.delete(trans_id);
-  	}
 
-  	// fetch new updates
-	getAllTransactions(0, 10);
+  		// fetch new updates
+		getAllTransactions(0, 10);
+  	}
 }
 
 // view transaction
