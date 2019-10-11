@@ -1,10 +1,10 @@
 <div id="user-dashboard" style="display: none;">
     <nav class="navbar navbar-expand-md card-feel" style="background-color: #0c1654;color: #FFF;">
         <!-- Brand -->
-        <a class="navbar-brand text-white" href="#" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <a class="navbar-brand text-white" href="javascript:void(0);" data-toggle="collapse" data-target="#collapsibleNavbar">
             <img src="/img/android-icon-48x48.png" style="border-radius: 0.5rem;"> <span class="text-white">SEBASTIAN BDC</span>
         </a>
-        <a href="javascript:void(0)">
+        <a href="javascript:void(0);">
             <i class="material-icons">perm_identity</i> <span class="agent-title"></span>
         </a>
 
@@ -76,6 +76,15 @@
 </div>
 
 <div id="user-login" class="container">
+    <nav class="navbar navbar-expand-md" style="background-color: transparent;color: #FFF;">
+        <!-- Brand -->
+        <a class="navbar-brand text-white" href="#" data-toggle="collapse" data-target="#collapsibleNavbar">
+            
+        </a>
+        <a href="javascript:void(0);" style="color: #FFF;" onclick="upgradeDatabase()">
+            <i class="material-icons">system_update_alt</i> <span class="agent-title"></span>
+        </a>
+    </nav>
     <form method="POST" onsubmit="return initLogin()" id="transaction-form">
         <div class="row">
             <div class="col-md-12 text-center py-5">

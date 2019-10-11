@@ -1,5 +1,5 @@
-// const endpoint = 'http://localhost:8181';
-const endpoint = 'https://canary.timsmate.com';
+const endpoint = 'http://localhost:8181';
+// const endpoint = 'https://canary.timsmate.com';
 
 window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
@@ -91,6 +91,37 @@ function installApp() {
 var user_id;
 var token;
 var current_date = new Date();
+
+// upgrade database
+function upgradeDatabase() {
+	swal({
+	  	title: "Are you sure?",
+	  	text: "Make sure your internet connection is on, application storage will install latest update from cloud server!",
+	  	icon: "info",
+	  	buttons: true,
+	  	dangerMode: true,
+	}).then((willDelete) => {
+	  	if (willDelete) {
+	  		// clear services worker for update
+	  		navigator.serviceWorker.getRegistrations().then(function(registrations) {
+				for(let registration of registrations) {
+			  		registration.unregister()
+				}
+			});
+
+	  		// refresh database
+	  		indexedDB.deleteDatabase("sebastianfx_db");
+	    	swal("Installation was successful!", {
+	      		icon: "success",
+	    	});
+	    	setTimeout((e) => {
+	    		window.location.reload();
+			}, 2000);
+	  	} else {
+	    	swal("");
+	  	}
+	});
+}
 
 // check login state
 function auth(username) {

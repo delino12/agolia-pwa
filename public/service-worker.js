@@ -16,6 +16,7 @@ var filesToCache = [
     'js/popper.min.js',
     'js/bootstrap.min.js',
     'js/select2.min.js',
+    'js/sweetalert.min.js',
     'js/numeral.js',
     'js/printme.js',
     'js/html2canvas.js',
@@ -25,7 +26,8 @@ var filesToCache = [
     'transaction',
     'completed',
     'users.json',
-    'banks.json'   
+    'banks.json',
+    'source-of-funds.json'
 ];
 
 // cache name
