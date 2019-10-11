@@ -823,7 +823,7 @@ if (!window.indexedDB) {
 function openDatabase() {
 	// return db instances
 	const DB_NAME 		= 'sebastianfx_db';
-	const DB_VERSION 	= 4;
+	const DB_VERSION 	= 1;
 
 	const database 	= indexedDB.open(DB_NAME, DB_VERSION);
 
