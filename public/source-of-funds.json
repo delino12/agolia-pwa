@@ -65,6 +65,18 @@
 	    {
 	      "name": "Business",
 	      "id": "16"
+	    },
+	    {
+	      "name": "Others",
+	      "id": "17"
+	    },
+	    {
+	      "name": "Bank Deposit",
+	      "id": "18"
+	    },
+	    {
+	      "name": "Bank Withdraw",
+	      "id": "19"
 	    }
    	]
 }

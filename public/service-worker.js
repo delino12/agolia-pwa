@@ -8,12 +8,14 @@ var filesToCache = [
     'img/favicon-96x96.png',
     'img/android-icon-192x192.png',
     'css/bootstrap.min.css',
+    'css/select2.min.css',
     'css/style.css',
     'https://fonts.googleapis.com/icon?family=Material+Icons',
     'https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Oswald:200,300,400,500,600,700',
     'js/jquery.min.js',
     'js/popper.min.js',
     'js/bootstrap.min.js',
+    'js/select2.min.js',
     'js/numeral.js',
     'js/printme.js',
     'js/html2canvas.js',
@@ -23,7 +25,7 @@ var filesToCache = [
     'transaction',
     'completed',
     'users.json',
-    'banks.json'
+    'banks.json'   
 ];
 
 // cache name

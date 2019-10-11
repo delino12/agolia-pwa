@@ -1,9 +1,6 @@
 // const endpoint = 'http://localhost:8181';
 const endpoint = 'https://canary.timsmate.com';
 
-// db version
-const DB_VERSION = 1;
-
 window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
 		// register the service worker
@@ -609,7 +606,7 @@ function addBDCMoreBankField() {
 									<i class="material-icons">clear</i>
 								</a>
 		                    </label>
-		                    <select class="form-control" id="receive_bank_name_${totalReceiveBankFieldFileCount}" required>
+		                    <select class="form-control" onchange="pupoplateAccField(${totalReceiveBankFieldFileCount})" id="receive_bank_name_${totalReceiveBankFieldFileCount}" required>
 		                        <option value="">Select Bank</option>
 		                    </select>
 		                </div>
@@ -634,6 +631,14 @@ function addBDCMoreBankField() {
 	}
 }
 
+async function pupoplateAccField(sn) {
+	// body...
+	var receive_bank_name  = $(`#receive_bank_name_${sn}`).val();
+	var get_account_number = await GetBdcsAccountNumber(receive_bank_name).then(nuban => nuban);
+	var receive_bank_nuban = $(`#receive_bank_nuban_${sn}`).val(get_account_number);
+	// console.log(get_account_number);
+}
+
 function removeBDCBank(addon_bank_id) {
 	// body...
 	totalReceiveBankFieldFileCount = (totalReceiveBankFieldFileCount - 1);
@@ -641,11 +646,10 @@ function removeBDCBank(addon_bank_id) {
 }
 
 function preloadBankCodes(sn, type) {
-	fetch(`/banks.json`).then(r => {
-		return r.json();
-	}).then(results => {
-
-		if(type == 1){
+	if(type == 1){
+		fetch(`/banks.json`).then(r => {
+			return r.json();
+		}).then(results => {
 			// console.log(results)
 			$(`#pay_customer_bank_name_${sn}`).html("");
 			$(`#pay_customer_bank_name_${sn}`).append(`
@@ -656,21 +660,27 @@ function preloadBankCodes(sn, type) {
 					<option value="${bank.code}">${bank.name}</option>
 				`);
 			});
-		}else if(type == 2){
+		}).catch(err => {
+			console.log(JSON.stringify(err));
+		})
+	}else if(type == 2){
+		fetchBDCbanksFromLocal().then(results => {
 			// console.log(results)
 			$(`#receive_bank_name_${sn}`).html("");
 			$(`#receive_bank_name_${sn}`).append(`
 				<option value=""> -- select bank -- </option>
 			`)
-			$.each(results.data, function(index, bank) {
+			$.each(results, function(index, bank) {
 				$(`#receive_bank_name_${sn}`).append(`
-					<option value="${bank.code}">${bank.name}</option>
+					<option value="${bank.GLRef}">${bank.Description}</option>
 				`);
 			});
-		}
-	}).catch(err => {
-		console.log(JSON.stringify(err));
-	})
+
+			$(`#receive_bank_name_${sn}`).select2();
+		}).catch(err => {
+			console.log(JSON.stringify(err));
+		})
+	}
 }
 
 function sourceOfFunds() {
@@ -685,6 +695,7 @@ function sourceOfFunds() {
 				<option value="${val.id}"> ${val.name} </option>
 			`);
 		});
+		$("#source_of_funds").select2();
 	}).catch(err => {
 		console.log(err);
 	})
@@ -715,7 +726,7 @@ function saveToQueue() {
 	var documents       	= files_box;
 	var email_addons        = email_fields_box;
 	var transport_charges   = $("#transport_charges").val();
-	var source_of_funds     = $("#source_of_funds").val();
+	var source_of_funds     = $("#source_of_funds").val()
 
 	if(email == ""){
 		email = "--";
@@ -811,8 +822,10 @@ if (!window.indexedDB) {
 // open database 
 function openDatabase() {
 	// return db instances
-	const DB_NAME 	= 'sebastianfx_db';
-	const database 	= indexedDB.open(DB_NAME, 1);
+	const DB_NAME 		= 'sebastianfx_db';
+	const DB_VERSION 	= 4;
+
+	const database 	= indexedDB.open(DB_NAME, DB_VERSION);
 
 	// on error catch errors 
 	database.onerror = (event) => {
@@ -841,6 +854,18 @@ function openDatabase() {
 			case 2:
 				// Create an objectStore for this database
 				upgradeDB.createObjectStore("users", {
+					keyPath: "id",
+					autoIncrement : true
+			  	});
+			case 3:
+				// Create an objectStore for this database
+				upgradeDB.createObjectStore("cloud_users", {
+					keyPath: "id",
+					autoIncrement : true
+			  	});
+			case 4: 
+				// Create an objectStore for this database
+				upgradeDB.createObjectStore("bdcs_banks", {
 					keyPath: "id",
 					autoIncrement : true
 			  	});
@@ -904,8 +929,15 @@ function countLocalTransactionsFromLiveData() {
 // fetch users from cloud
 fetchUsersFromCloud();
 
+// fetch customers from cloud
+fetchCustomersFromCloud();
+
 // fetch transactions from cloud
 fetchTransactionsFromCloud();
+
+// fetch canary tims banks
+fetchCanaryTimsBanks();
+
 
 // fetch users from cloud
 async function fetchUsersFromCloud() {
@@ -921,6 +953,15 @@ async function fetchUsersFromCloud() {
 	}
 }
 
+// fetch users from cloud
+async function fetchCustomersFromCloud() {
+	var customers = await resolveAllServerCustomers().then(customers => customers).catch(err => []);
+	// console.log(customers);
+	customers.forEach(function(customer) {
+		saveToCustomers(customer);
+	})
+}
+
 // fetch transactions from cloud
 async function fetchTransactionsFromCloud() {
 	// body...
@@ -934,6 +975,15 @@ async function fetchTransactionsFromCloud() {
 			saveCloudToLocalTransaction(transact);
 		})
 	}
+}
+
+// fetch bdcs banks
+async function fetchCanaryTimsBanks() {
+	var bdcs_banks = await resolveAllServerBdcsAccount().then(banks => banks);
+	// console.log(users);
+	bdcs_banks.forEach(function(banks) {
+		saveToBdcsBanks(banks);
+	})
 }
 
 // resolve total users
@@ -958,6 +1008,36 @@ function resolveAllServerUsers() {
 			return r.json();
 		}).then(results => {
 			console.log(results)
+			resolve(results)
+		}).catch(err => {
+			console.log(err)
+			reject(err)
+		})
+	})
+}
+
+// resolve all users
+function resolveAllServerCustomers() {
+	return new Promise((resolve, reject) => {
+		fetch(`${endpoint}/api/all/customers`).then(r => {
+			return r.json();
+		}).then(results => {
+			// console.log(results)
+			resolve(results)
+		}).catch(err => {
+			console.log(err)
+			reject(err)
+		})
+	})
+}
+
+// resolve all bdcs bank
+function resolveAllServerBdcsAccount() {
+	return new Promise((resolve, reject) => {
+		fetch(`${endpoint}/api/all/bdcs/banks`).then(r => {
+			return r.json();
+		}).then(results => {
+			// console.log(results)
 			resolve(results)
 		}).catch(err => {
 			console.log(err)
@@ -996,6 +1076,52 @@ function resolveAllAgentTransaction() {
 	})
 }
 
+// resolve banks from local
+function fetchBDCbanksFromLocal() {
+	const db = openDatabase();
+
+	return new Promise((resolve, reject) => {
+		db.onsuccess = (event) => {
+			// Do something with request.result!
+			var query = event.target.result;
+		  	var bdcs_banks = query.transaction("bdcs_banks", "readwrite").objectStore("bdcs_banks").getAll();
+
+		  	// on success
+		  	bdcs_banks.onsuccess = (event) => {
+		  		resolve(event.target.result);
+		  	}
+
+		  	// on error
+		  	bdcs_banks.onerror = (event) => {
+		  		reject(event.target.result)
+		  	}
+		}
+	})
+}
+
+// resolve banks from local
+function fetchCustomersFromLocal() {
+	const db = openDatabase();
+
+	return new Promise((resolve, reject) => {
+		db.onsuccess = (event) => {
+			// Do something with request.result!
+			var query = event.target.result;
+		  	var cloud_customers = query.transaction("cloud_users", "readwrite").objectStore("cloud_users").getAll();
+
+		  	// on success
+		  	cloud_customers.onsuccess = (event) => {
+		  		resolve(event.target.result);
+		  	}
+
+		  	// on error
+		  	cloud_customers.onerror = (event) => {
+		  		reject(event.target.result)
+		  	}
+		}
+	})
+}
+
 // save to transactions
 function saveCloudToLocalTransaction(payload) {
 	// body...
@@ -1022,6 +1148,38 @@ function saveToUsers(payload) {
 		const query = event.target.result;
 		const users = query.transaction("users", "readwrite").objectStore("users");
 		users.add(payload);
+
+		// return 
+		return true;
+	}
+}
+
+// save to customers
+function saveToCustomers(payload) {
+	// body
+	const db = openDatabase();
+
+	// on success add user
+	db.onsuccess = (event) => {
+		const query = event.target.result;
+		const users = query.transaction("cloud_users", "readwrite").objectStore("cloud_users");
+		users.add(payload);
+
+		// return 
+		return true;
+	}
+}
+
+// save to bdcs banks
+function saveToBdcsBanks(payload) {
+	// body
+	const db = openDatabase();
+
+	// on success add user
+	db.onsuccess = (event) => {
+		const query = event.target.result;
+		const bdcs_banks = query.transaction("bdcs_banks", "readwrite").objectStore("bdcs_banks");
+		bdcs_banks.add(payload);
 
 		// return 
 		return true;
@@ -2309,6 +2467,23 @@ function getBankByCode(bank_code) {
 				/* iterate through array or object */
 				if(bank_code == bank.code){
 					resolve(bank.name)
+				}
+			});
+		}).catch(err => {
+			reject(err)
+		})
+	});
+}
+
+// get account number fromdata
+function GetBdcsAccountNumber(gl_ref) {
+	return new Promise((resolve, reject) => {
+		fetchBDCbanksFromLocal().then(results => {
+			// console.log(results)
+			$.each(results, function(index, bank) {
+				/* iterate through array or object */
+				if(gl_ref == bank.GLRef){
+					resolve(bank.NUBAN)
 				}
 			});
 		}).catch(err => {
