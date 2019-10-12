@@ -1329,6 +1329,9 @@ function countCompletedData() {
 
 // get all transactions 
 function getAllTransactions(start = 0, total = 10) {
+	// clear transaction data
+	$("#load-all-transactions").html("");
+
 	// count users 
 	countData();
 
@@ -1366,7 +1369,6 @@ function getAllTransactions(start = 0, total = 10) {
 				}
 				// console.log('start reading dataset is ready');
 				var sn = 0;
-				$("#load-all-transactions").html("");
 				$.each(transactions_box, function(index, val) {
 				    sn++;
 				    if(val.currency == "2"){
@@ -1403,7 +1405,7 @@ function getAllTransactions(start = 0, total = 10) {
 					                <a href="javascript:void(0);" ${shade} onclick="syncTransaction(${val.id})" id="sync-icon-${val.id}">
 					                	<i class="material-icons py-1">cloud_upload</i>
 					                </a>
-					                <a href="javascript:void(0);" ${shade} onclick="deleteTransaction(${val.id})">
+					                <a href="javascript:void(0);" ${shade} onclick="initDeleteTransaction(${val.id})">
 					                <i class="material-icons py-1">restore_from_trash</i></a>
 					            </td>
 					        </tr>
@@ -1829,43 +1831,55 @@ function viewCompletedTransaction(trans_id) {
 
 // sync records
 function syncTransaction(trans_id) {
-	$(`#sync-icon-${trans_id}`).html(`
-		<span class="small">uploading...</span>
-	`);
+	swal({
+	  	title: "Are you sure?",
+	  	text: "Make sure your internet connection is on, application will synchronise data to tims!",
+	  	icon: "info",
+	  	buttons: true,
+	  	dangerMode: true,
+	}).then((synchronize) => {
+	  	if (synchronize) {
+	  		$(`#sync-icon-${trans_id}`).html(`
+				<span class="small">uploading...</span>
+			`);
 
-	getOneTransaction(trans_id).then(transaction => {
-		// console.log(transaction);
-		$.ajax({
-  			url: `${endpoint}/api/save/transaction`,
-  			type: 'POST',
-  			dataType: 'json',
-  			data: transaction,
-  			success: function(data){
-  				// console.log(data);
-  				if(data.status == 'success'){
-  					notifyMe("success", data.message);
-					$(`#sync-icon-${trans_id}`).html(`
-						<i class="material-icons">cloud_done</i>
-					`);
+			getOneTransaction(trans_id).then(transaction => {
+				// console.log(transaction);
+				$.ajax({
+		  			url: `${endpoint}/api/save/transaction`,
+		  			type: 'POST',
+		  			dataType: 'json',
+		  			data: transaction,
+		  			success: function(data){
+		  				// console.log(data);
+		  				if(data.status == 'success'){
+		  					notifyMe("success", data.message);
+							$(`#sync-icon-${trans_id}`).html(`
+								<i class="material-icons">cloud_done</i>
+							`);
 
-					// lose cargo
-					deleteTransaction(trans_id);
-  				}else{
-  					notifyMe("danger", data.message);
+							// lose cargo
+							deleteTransaction(trans_id);
+		  				}else{
+		  					notifyMe("danger", data.message);
+							$(`#sync-icon-${trans_id}`).html(`
+								<i class="material-icons">cloud_upload</i>
+							`);	
+		  				}
+		  			}
+		  		}).done(function() {
+		  			console.log("done");
+		  		}).fail(function(err) {
+		  			console.log(err);
+		  			notifyMe("danger", "Error synching to cloud service!");
 					$(`#sync-icon-${trans_id}`).html(`
 						<i class="material-icons">cloud_upload</i>
-					`);	
-  				}
-  			}
-  		}).done(function() {
-  			console.log("done");
-  		}).fail(function(err) {
-  			console.log(err);
-  			notifyMe("danger", "Error synching to cloud service!");
-			$(`#sync-icon-${trans_id}`).html(`
-				<i class="material-icons">cloud_upload</i>
-			`);
-  		});
+					`);
+		  		});
+			});
+	  	} else {
+	    	swal("");
+	  	}
 	});
 }
 
@@ -1886,6 +1900,23 @@ function deleteTransaction(trans_id) {
   		// fetch new updates
 		getAllTransactions(0, 10);
   	}
+}
+
+// init delete transaction
+function initDeleteTransaction(trans_id) {
+	swal({
+	  	title: "Are you sure?",
+	  	text: "Transaction will be removed from your device!",
+	  	icon: "warning",
+	  	buttons: true,
+	  	dangerMode: true,
+	}).then((willDelete) => {
+	  	if (willDelete) {
+	  		deleteTransaction(trans_id);
+	  	} else {
+	    	swal("");
+	  	}
+	});
 }
 
 // view transaction
