@@ -1,7 +1,7 @@
 {
-  "name": "sebastianfx",
+  "name": "Agolia",
   "version": "1.0.0",
-  "description": "Sebastianfx PWA",
+  "description": "Agolia PWA",
   "main": "nodemon bin/www",
   "scripts": {
     "dev": "nodemon bin/www",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://delino12@bitbucket.org/delino12/sebastian-pwa.git"
+    "url": "git+https://github.com/delino12/agolia-pwa.git"
   },
   "keywords": [
     "nodejs",
@@ -20,7 +20,7 @@
   ],
   "author": "Cavidel - Ekpoto Liberty",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/delino12/sebastian-pwa#readme",
+  "homepage": "https://github.com/delino12/agolia-pwa.git#readme",
   "dependencies": {
     "@sendgrid/mail": "^6.4.0",
     "bcryptjs": "^2.4.3",
