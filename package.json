@@ -1,7 +1,7 @@
 {
-  "name": "Agolia",
+  "name": "Anchoria",
   "version": "1.0.0",
-  "description": "Agolia PWA",
+  "description": "Anchoria PWA",
   "main": "nodemon bin/www",
   "scripts": {
     "dev": "nodemon bin/www",

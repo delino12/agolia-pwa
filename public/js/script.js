@@ -1,5 +1,5 @@
 // const endpoint = 'http://localhost:8181';
-const endpoint = 'https://canary.timsmate.com';
+const endpoint = 'https://tims.timsmate.com';
 
 window.addEventListener('load', function(){
     if ('serviceWorker' in navigator) {
@@ -2597,6 +2597,6 @@ function printReceipt() {
 	$("#print-deal-slip").hide();
 	$("#printable-area").printMe({
 		"path": ["css/bootstrap.css"],
-		"title": "SB-BDC Receipt" 
+		"title": "Anchoria-BDC Receipt" 
 	});
 }
